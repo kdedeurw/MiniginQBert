@@ -3,6 +3,7 @@
 #include "Timer.h"
 #include "GlobalInput.h"
 #include "GlobalMemoryPools.h"
+#include "Camera.h"
 
 class Scene;
 struct WindowInfo;
@@ -22,6 +23,7 @@ public:
 	Timer<high_resolution_clock> Timer{};
 	GlobalInput& GlobalInput{ GlobalInput::GetInstance() };
 	GlobalMemoryPools& GlobalMemoryPools{ GlobalMemoryPools::GetInstance() };
+	Camera Camera{};
 
 private:
 	friend static GameState& SingletonRef<GameState>::GetInstance();

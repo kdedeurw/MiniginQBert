@@ -69,10 +69,11 @@ void FPSComponent::Render() const
 	Transform& trans = m_pGameObject->GetLocalTransform();
 	const Vector2& pos = trans.GetPosition();
 	const float rot = trans.GetRotation();
-	if (m_pTextureData != nullptr)
-	{
-		Renderer::GetInstance().RenderTexture(m_pTextureData->GetSDLTexture(), pos.x, pos.y, rot);
-	}
+	const Vector4& srcRect = m_pTextureData->GetSourceRect();
+	const Vector4& dstRect = m_pTextureData->GetDestRect();
+	const Vector2& scale = trans.GetScale();
+	if (m_pTextureData)
+		Renderer::GetInstance().RenderUITexture(m_pTextureData->GetSDLTexture(), pos, dstRect, srcRect, scale, rot);
 }
 
 void FPSComponent::SetFont(Font* pFont)

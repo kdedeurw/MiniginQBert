@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Collision2D.cpp" />
     <ClCompile Include="Commands.cpp" />
     <ClCompile Include="ControllerListener.cpp" />
@@ -51,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BinaryReader.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Collision2D.h" />
     <ClInclude Include="Command.h" />
     <ClInclude Include="Commands.h" />

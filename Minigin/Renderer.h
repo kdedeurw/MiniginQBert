@@ -15,18 +15,24 @@ public:
 	void Render() const;
 	void Destroy();
 
-	void DrawPoint(float x, float y, RGBAColour colour = RGBAColour{ 255, 255, 255, 255 }) const;
-	void DrawPoint(Vector2 pos, RGBAColour colour = RGBAColour{ 255, 255, 255, 255 }) const { DrawPoint(std::move(pos.x), std::move(pos.y), colour); };
+	void DrawPoint(float x, float y, RGBAColour colour = RGBAColour{ 255, 255, 255, 255 }, bool isCameraTransformations = true) const;
+	void DrawPoint(Vector2 pos, RGBAColour colour = RGBAColour{ 255, 255, 255, 255 }, bool isCameraTransformations = true) const { DrawPoint(std::move(pos.x), std::move(pos.y), colour, isCameraTransformations); };
 
-	void DrawLine(float x1, float y1, float x2, float y2, RGBAColour colour = RGBAColour{ 255, 255, 255, 255 });
-	void DrawLine(Vector2 p1, Vector2 p2, RGBAColour colour = RGBAColour{ 255, 255, 255, 255 }) { DrawLine(std::move(p1.x), std::move(p1.y), std::move(p2.x), std::move(p2.y), colour); }
+	void DrawLine(float x1, float y1, float x2, float y2, RGBAColour colour = RGBAColour{ 255, 255, 255, 255 }, bool isCameraTransformations = true);
+	void DrawLine(Vector2 p1, Vector2 p2, RGBAColour colour = RGBAColour{ 255, 255, 255, 255 }, bool isCameraTransformations = true) { DrawLine(std::move(p1.x), std::move(p1.y), std::move(p2.x), std::move(p2.y), colour, isCameraTransformations); }
+
+	void RenderUITexture(SDL_Texture* pTexture, float x, float y, float destX, float destY, float width, float height, float srcX, float srcY, float srcW, float srcH, float scaleX, float scaleY, float angle = 0.f, const Vector2& pivot = Vector2{ 0.5f, 0.5f }, RenderFlip flip = RenderFlip::None) const;
 
 	void RenderTexture(SDL_Texture* pTexture, float x, float y, float angle = 0.f, const Vector2& pivot = Vector2{ 0.5f, 0.5f }, RenderFlip flip = RenderFlip::None) const;
 	void RenderTexture(SDL_Texture* pTexture, float x, float y, float width, float height, float angle = 0.f, const Vector2& pivot = Vector2{ 0.5f, 0.5f }, RenderFlip flip = RenderFlip::None) const;
 	void RenderTexture(SDL_Texture* pTexture, float x, float y, float width, float height, float srcX, float srcY, float angle = 0.f, const Vector2& pivot = Vector2{ 0.5f, 0.5f }, RenderFlip flip = RenderFlip::None) const;
 	void RenderTexture(SDL_Texture* pTexture, float x, float y, float width, float height, float srcX, float srcY, float srcW, float srcH, float angle = 0.f, const Vector2& pivot = Vector2{ 0.5f, 0.5f }, RenderFlip flip = RenderFlip::None) const;
+	void RenderTexture(SDL_Texture* pTexture, float x, float y, float destX, float destY, float width, float height, float srcX, float srcY, float srcW, float srcH, float scaleX, float scaleY, float angle = 0.f, const Vector2& pivot = Vector2{ 0.5f, 0.5f }, RenderFlip flip = RenderFlip::None) const;
 
 	//overloads
+	void RenderUITexture(SDL_Texture* pTexture, const Vector2& pos, const Vector4& dstRect, const Vector4& srcRect, const Vector2& scale, float angle = 0.f, const Vector2& pivot = Vector2{ 0.5f, 0.5f }, RenderFlip flip = RenderFlip::None) const
+	{ RenderUITexture(pTexture, pos.x, pos.y, dstRect.x, dstRect.y, dstRect.z, dstRect.w, srcRect.x, srcRect.y, srcRect.z, srcRect.w, scale.x, scale.y, angle, pivot, flip); };
+
 	void RenderTexture(SDL_Texture* pTexture, const Vector2& pos, float angle = 0.f, const Vector2& pivot = Vector2{ 0.5f, 0.5f }, RenderFlip flip = RenderFlip::None) const
 	{ RenderTexture(pTexture, pos.x, pos.y, angle, pivot, flip); };
 	void RenderTexture(SDL_Texture* pTexture, const Vector2& pos, const Vector2& dimensions, float angle = 0.f, const Vector2& pivot = Vector2{ 0.5f, 0.5f }, RenderFlip flip = RenderFlip::None) const
@@ -39,6 +45,8 @@ public:
 	{ RenderTexture(pTexture, pos.x, pos.x, dimensions.x, dimensions.y, srcXY.x, srcXY.y, srcWH.x, srcWH.y, angle, pivot, flip); };
 	void RenderTexture(SDL_Texture* pTexture, const Vector4& dstRect, const Vector4& srcRect, float angle = 0.f, const Vector2& pivot = Vector2{ 0.5f, 0.5f }, RenderFlip flip = RenderFlip::None) const
 	{ RenderTexture(pTexture, dstRect.x, dstRect.y, dstRect.z, dstRect.w, srcRect.x, srcRect.y, srcRect.z, srcRect.w, angle, pivot, flip); };
+	void RenderTexture(SDL_Texture* pTexture, const Vector2& pos, const Vector4& dstRect, const Vector4& srcRect, const Vector2& scale, float angle = 0.f, const Vector2& pivot = Vector2{ 0.5f, 0.5f }, RenderFlip flip = RenderFlip::None) const
+	{ RenderTexture(pTexture, pos.x, pos.y, dstRect.x, dstRect.y, dstRect.z, dstRect.w, srcRect.x, srcRect.y, srcRect.z, srcRect.w, scale.x, scale.y, angle, pivot, flip); };
 
 	SDL_Renderer* GetSDLRenderer() const { return m_pRenderer; }
 

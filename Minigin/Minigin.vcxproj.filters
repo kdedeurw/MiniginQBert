@@ -88,6 +88,9 @@
     <ClCompile Include="Transform.cpp">
       <Filter>Base Files\General</Filter>
     </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Core Files\Rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h" />
@@ -231,6 +234,9 @@
     </ClInclude>
     <ClInclude Include="Transform.h">
       <Filter>Base Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Core Files\Rendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
