@@ -1,9 +1,0 @@
-//*FMOD (Sounds)
-//www.fmod.org
-#pragma warning(push)
-#pragma warning(disable: 4505 26812)
-#include "fmod.hpp" 
-#include "fmod_errors.h"
-#pragma warning(pop)
-
-$(SolutionDir)3rdParty\Fmod\inc
