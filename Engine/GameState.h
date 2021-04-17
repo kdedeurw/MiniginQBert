@@ -1,7 +1,8 @@
 #pragma once
 #include "SingletonRef.h"
 #include "Timer.h"
-#include "GlobalInput.h"
+#include "KeyboardMouseListener.h"
+#include "ControllerListener.h"
 #include "GlobalMemoryPools.h"
 #include "Camera.h"
 
@@ -22,7 +23,8 @@ public:
 	Scene* pUIScene{}; //TODO: keep? vs SceneManager
 	WindowInfo* pWindowInfo{};
 	Timer<high_resolution_clock> Timer{};
-	GlobalInput& GlobalInput{ GlobalInput::GetInstance() };
+	KeyboardMouseListener& KeyboardMouseListener{ KeyboardMouseListener::GetInstance() };
+	ControllerListener& ControllerListener{ ControllerListener::GetInstance() };
 	GlobalMemoryPools& GlobalMemoryPools{ GlobalMemoryPools::GetInstance() };
 	Camera Camera{};
 

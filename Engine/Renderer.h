@@ -22,7 +22,9 @@ public:
 	void DrawLine(Vector2 p1, Vector2 p2, RGBAColour colour = RGBAColour{ 255, 255, 255, 255 }, bool isCameraTransformations = true) const
 	{ DrawLine(std::move(p1.x), std::move(p1.y), std::move(p2.x), std::move(p2.y), colour, isCameraTransformations); }
 
+	//function specifically designed for rendering SDL text
 	void RenderText(SDL_Texture* pTexture, float x, float y, float destX, float destY, float scaleX = 1.f, float scaleY = 1.f, float angle = 0.f, const Vector2& pivot = Vector2{ 0.5f, 0.5f }, RenderFlip flip = RenderFlip::None) const;
+	//will render without camera transformations
 	void RenderUITexture(SDL_Texture* pTexture, float x, float y, float destX, float destY, float width, float height, float srcX, float srcY, float srcW, float srcH, float scaleX, float scaleY, float angle = 0.f, const Vector2& pivot = Vector2{ 0.5f, 0.5f }, RenderFlip flip = RenderFlip::None) const;
 
 	void RenderTexture(SDL_Texture* pTexture, float x, float y, float angle = 0.f, const Vector2& pivot = Vector2{ 0.5f, 0.5f }, RenderFlip flip = RenderFlip::None) const;

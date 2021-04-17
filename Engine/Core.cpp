@@ -4,7 +4,8 @@
 #include <chrono>
 #include <thread>
 #include "Transform.h"
-#include "GlobalInput.h"
+#include "KeyboardMouseListener.h"
+#include "ControllerListener.h"
 #include "SceneManager.h"
 #include "Renderer.h"
 #include "ResourceManager.h"
@@ -15,17 +16,22 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <SDL_image.h>
+#include <SDL_mixer.h>
 
 //Project includes
 #include "Timer.h"
 #include "Components.h"
 #include "GameState.h"
+#include "ServiceLocator.h"
+#include "SoundSystem.h"
 
 using namespace Engine2D;
 
 Core::Core(const char* pTitle, int w, int h, int msPF)
 	: m_QuitKey{ Key::Escape }
 	, m_WindowInfo{ pTitle, w, h, msPF }
+	, m_pWindow{}
+	, m_AudioThread{}
 {
 	//set random seed
 	srand((unsigned int)time(NULL));
@@ -42,6 +48,8 @@ Core::~Core()
 void Core::Init()
 {
 	InitializeSDL();
+
+	ServiceLocator::RegisterSoundSystem(new SoundSystem{});
 }
 
 void Core::InitializeSDL()
@@ -71,20 +79,22 @@ void Core::Cleanup()
 {
 	SDL_DestroyWindow(m_pWindow);
 	m_pWindow = nullptr;
-	TTF_Quit();
-	IMG_Quit();
+
+	delete ServiceLocator::GetSoundSystem();
+
 	SDL_Quit();
 }
 
 bool Core::ProcessInputs()
 {
-	GlobalInput& im = GlobalInput::GetInstance();
+	KeyboardMouseListener& kbml = KeyboardMouseListener::GetInstance();
+	ControllerListener& cl = ControllerListener::GetInstance();
 
-	im.GetKeyboardMouseListener().ProcessInput();
-	im.GetControllerListener().ProcessInput();
+	kbml.ProcessInput();
+	cl.ProcessInput();
 
-	//return im.GetKeyboardMouseListener().IsQuit();
-	return im.GetKeyboardMouseListener().IsPressed(m_QuitKey);
+	//return kbml.IsQuit();
+	return kbml.IsPressed(m_QuitKey);
 }
 
 void Core::Run()

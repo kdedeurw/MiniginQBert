@@ -13,6 +13,11 @@ ResourceManager::~ResourceManager()
 {
 	m_Textures.clear();
 	m_Fonts.clear();
+
+	//wrong order of execution between cleanup of core and resourcemanager
+	//however, this won't matter, since SDL has safety checks
+	TTF_Quit();
+	IMG_Quit();
 }
 
 void ResourceManager::Init(const std::string& dataPath)

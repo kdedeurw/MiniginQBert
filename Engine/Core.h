@@ -1,5 +1,6 @@
 #pragma once
 #include "WindowInfo.h"
+#include <thread>
 
 struct SDL_Window;
 enum class Key;
@@ -13,7 +14,7 @@ namespace Engine2D
 
 		void Init();
 		void Run();
-		void AddFPSScene(float x = 0, float y = 480) const;
+		void AddFPSScene(float x = 0.f, float y = 480.f) const;
 		void AddDemoScene() const;
 		void ForceQuit();
 		void SetForceQuitKey(Key key);
@@ -24,6 +25,7 @@ namespace Engine2D
 		Key m_QuitKey;
 		SDL_Window* m_pWindow = nullptr;
 		WindowInfo m_WindowInfo;
+		std::thread m_AudioThread;
 
 		void InitializeSDL();
 		void Cleanup();

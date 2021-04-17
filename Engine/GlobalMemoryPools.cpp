@@ -57,7 +57,7 @@ GlobalMemoryPools::GlobalMemoryPools()
 {
 	m_ComponentAllocator.Initialize(8192 * 10);
 	m_StackAllocator.Initialize(2048);
-	m_SceneAllocator.Initialize(sizeof(Scene) * 3);
+	m_SceneAllocator.Initialize(sizeof(Scene) * 5);
 	m_GameObjectAllocator.Initialize(sizeof(GameObject) * 1000);
 	m_TransformAllocator.Initialize(sizeof(Transform) * 2000);
 	m_TextureAllocator.Initialize(sizeof(Texture2D) * 100);

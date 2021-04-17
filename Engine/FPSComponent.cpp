@@ -60,6 +60,7 @@ void FPSComponent::Update()
 		}
 		SDL_FreeSurface(pSurface);
 		m_pTextureData = GetTextureData(pTexture);
+		m_pTextureData->InitializeTexture(); //TODO: replace for performance
 		m_NeedsUpdate = false;
 	}
 }
@@ -67,11 +68,14 @@ void FPSComponent::Update()
 void FPSComponent::Render() const
 {
 	Transform& trans = m_pGameObject->GetLocalTransform();
-	const Vector2& pos = trans.GetPosition();
+	Vector2 pos = trans.GetPosition();
 	const float rot = trans.GetRotation();
 	const Vector4& srcRect = m_pTextureData->GetSourceRect();
 	const Vector4& dstRect = m_pTextureData->GetDestRect();
 	const Vector2& scale = trans.GetScale();
+	//TODO: define FPS 'corner' position and math (probs in Core::AddFPS) enum class?
+	pos.x += dstRect.z / 2;
+	pos.y -= dstRect.w / 2;
 	if (m_pTextureData)
 		Renderer::GetInstance().RenderUITexture(m_pTextureData->GetSDLTexture(), pos, dstRect, srcRect, scale, rot);
 }

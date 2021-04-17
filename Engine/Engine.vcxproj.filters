@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Subject.cpp">
-      <Filter>Core Files\General</Filter>
-    </ClCompile>
     <ClCompile Include="Collision2D.cpp">
       <Filter>Core Files\Math</Filter>
     </ClCompile>
@@ -52,12 +49,6 @@
     <ClCompile Include="Texture2DComponent.cpp">
       <Filter>Base Files\Components</Filter>
     </ClCompile>
-    <ClCompile Include="PhysicsComponent.cpp">
-      <Filter>Base Files\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="RigidBody.cpp">
-      <Filter>Base Files\General</Filter>
-    </ClCompile>
     <ClCompile Include="Math2D.cpp">
       <Filter>Core Files\Math</Filter>
     </ClCompile>
@@ -94,12 +85,18 @@
     <ClCompile Include="SoundSystem.cpp">
       <Filter>Base Files\Audio</Filter>
     </ClCompile>
+    <ClCompile Include="Subject.cpp">
+      <Filter>Base Files\Miscellaneous</Filter>
+    </ClCompile>
+    <ClCompile Include="ServiceLocator.cpp">
+      <Filter>Base Files\Miscellaneous</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugSoundSystem.cpp">
+      <Filter>Base Files\Audio</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="Observer.h">
-      <Filter>Core Files\General</Filter>
-    </ClInclude>
     <ClInclude Include="Singleton.h">
       <Filter>Core Files\General</Filter>
     </ClInclude>
@@ -107,9 +104,6 @@
       <Filter>Core Files\General</Filter>
     </ClInclude>
     <ClInclude Include="SingletonRef.h">
-      <Filter>Core Files\General</Filter>
-    </ClInclude>
-    <ClInclude Include="Subject.h">
       <Filter>Core Files\General</Filter>
     </ClInclude>
     <ClInclude Include="Timer.h">
@@ -154,9 +148,6 @@
     <ClInclude Include="KeyboardMouseListener.h">
       <Filter>Base Files\Input\Managers</Filter>
     </ClInclude>
-    <ClInclude Include="GlobalInput.h">
-      <Filter>Base Files\Input</Filter>
-    </ClInclude>
     <ClInclude Include="GlobalMemoryPools.h">
       <Filter>Core Files\Memory</Filter>
     </ClInclude>
@@ -186,12 +177,6 @@
     </ClInclude>
     <ClInclude Include="Texture2DComponent.h">
       <Filter>Base Files\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysicsComponent.h">
-      <Filter>Base Files\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="RigidBody.h">
-      <Filter>Base Files\General</Filter>
     </ClInclude>
     <ClInclude Include="Math2D.h">
       <Filter>Core Files\Math</Filter>
@@ -244,6 +229,24 @@
     <ClInclude Include="SoundSystem.h">
       <Filter>Base Files\Audio</Filter>
     </ClInclude>
+    <ClInclude Include="Observer.h">
+      <Filter>Base Files\Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="Subject.h">
+      <Filter>Base Files\Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceLocator.h">
+      <Filter>Base Files\Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadSafeQueue.h">
+      <Filter>Base Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseSoundSystem.h">
+      <Filter>Base Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugSoundSystem.h">
+      <Filter>Base Files\Audio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core Files">
@@ -290,6 +293,9 @@
     </Filter>
     <Filter Include="Core Files\Memory\Allocators">
       <UniqueIdentifier>{6f09d0ba-b1f4-4e7f-a77e-11a6b25a6a8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base Files\Miscellaneous">
+      <UniqueIdentifier>{2c651a4c-0f0f-4bab-8122-1818a6766bfa}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
