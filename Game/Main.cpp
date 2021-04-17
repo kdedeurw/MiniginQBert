@@ -10,12 +10,12 @@
 #include "Collision2D.h"
 #include "RGBAColour.h"
 
-#include "Minigin.h"
-//#include <SDL.h>
+#include "Core.h"
 #include "SceneManager.h"
 #include "ResourceManager.h"
 #include "GlobalMemoryPools.h"
-#include "GlobalInput.h"
+#include "KeyboardMouseListener.h"
+#include "ControllerListener.h"
 #include "GameState.h"
 #include "GameObject.h"
 #include "Components.h"
@@ -27,6 +27,9 @@
 #include "QBertGameObserver.h"
 #include "QBertPlayer.h"
 #include <iostream>
+
+#include "CameraTester.h"
+#include "SoundTester.h"
 
 void QBertAssignment()
 {
@@ -95,20 +98,56 @@ void QBertAssignment()
 	std::cout << "\nHow to play:\nPress Space to kill Player 1\nPress Enter to kill Player 2\nPress 1 for a random point event for Player 1\nPress 2 for a random point event for Player 2\n\n";
 }
 
+void SoundSystemAssignment(bool isDebugSound = false)
+{
+	GlobalMemoryPools& gm = GlobalMemoryPools::GetInstance();
+	Scene& soundScene = SceneManager::GetInstance().CreateScene("SoundScene");
+
+	GameState& gs = GameState::GetInstance();
+	const WindowInfo& wi = *gs.pWindowInfo;
+
+	GameObject* pGo = soundScene.CreateGameObject();
+	pGo->GetLocalTransform().Translate(wi.Width / 2.f, wi.Height / 3.f);
+
+	TextComponent* pTc = gm.CreateComponent<TextComponent>();
+	pTc->SetFont(ResourceManager::GetInstance().LoadFont("Lingua.otf", 24));
+	pTc->SetColour(RGBAColour{ 255, 255, 255, 255 });
+	//pTc->GetOffset() = Vector2{ 0.f, 25.f };
+	pTc->SetText("Press 1 to play sound");
+	pGo->AddComponent(pTc);
+
+	SoundTester* pSt = gm.CreateComponent<SoundTester>();
+	pGo->AddComponent(pSt);
+	
+	pSt->SetDebugSoundInit(isDebugSound);
+}
+
 int main(int, char* [])
 {
-	srand((unsigned int)time(NULL));
+	//srand((unsigned int)time(NULL));
+	
+	Engine2D::Core application{};
+	application.Init();
+	application.AddDemoScene();
+	application.AddFPSScene();
+	
+	/*
+	GlobalMemoryPools& gm = GlobalMemoryPools::GetInstance();
+	Scene& scene = SceneManager::GetInstance().CreateScene("CameraTestScene");
+	GameObject* pGo = scene.CreateGameObject();
 
-	dae::Minigin game{};
-	game.StartUp();
-	game.AddDemoScene();
-	game.AddFPSScene();
+	CameraTester* pCt = gm.CreateComponent<CameraTester>();
+	pGo->AddComponent(pCt);
+	*/
 
-	//GlobalMemoryPools& gm = GlobalMemoryPools::GetInstance();
-	//Scene& scene = SceneManager::GetInstance().CreateScene("QBertScene");
-	//GameObject* pGo = scene.CreateGameObject();
-
-	game.Run();
+	//switch from debugsound to normal sound by changing the bool below
+	SoundSystemAssignment(false);
+	
+	application.Run();
 
 	return 0;
+	//TODO: remove SDL2.dll's from System32
+	//TODO: add xcopy to post build events
+	//TODO: test .dll's in build directory and run
+	//TODO: Dependencies folder?
 }

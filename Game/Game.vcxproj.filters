@@ -25,27 +25,34 @@
     <Filter Include="Assignments\QBert">
       <UniqueIdentifier>{525ea76b-c860-4530-abee-e51620cd3551}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Base">
+      <UniqueIdentifier>{581d3fd3-4321-4c83-97b4-09241817c2fa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CharacterController.cpp">
       <Filter>Game Files</Filter>
     </ClCompile>
-    <ClCompile Include="PhysicsComponent.cpp">
-      <Filter>Header Files\Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysicsManager.cpp">
-      <Filter>Header Files\Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="Main.cpp" />
     <ClCompile Include="MovementComponent.cpp">
       <Filter>Game Files</Filter>
     </ClCompile>
-    <ClCompile Include="pch.cpp" />
     <ClCompile Include="QBertGameObserver.cpp">
       <Filter>Assignments\QBert</Filter>
     </ClCompile>
     <ClCompile Include="QBertPlayer.cpp">
       <Filter>Assignments\QBert</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraTester.cpp">
+      <Filter>Game Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundTester.cpp">
+      <Filter>Game Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -55,17 +62,9 @@
     <ClInclude Include="CharacterController.h">
       <Filter>Game Files</Filter>
     </ClInclude>
-    <ClInclude Include="PhysicsManager.h">
-      <Filter>Header Files\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysicsComponent.h">
-      <Filter>Header Files\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="catch.hpp" />
     <ClInclude Include="MovementComponent.h">
       <Filter>Game Files</Filter>
     </ClInclude>
-    <ClInclude Include="pch.h" />
     <ClInclude Include="QBertGameObserver.h">
       <Filter>Assignments\QBert</Filter>
     </ClInclude>
@@ -74,6 +73,18 @@
     </ClInclude>
     <ClInclude Include="QBertPlayer.h">
       <Filter>Assignments\QBert</Filter>
+    </ClInclude>
+    <ClInclude Include="catch.hpp">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraTester.h">
+      <Filter>Game Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundTester.h">
+      <Filter>Game Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
