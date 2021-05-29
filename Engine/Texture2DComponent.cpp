@@ -4,7 +4,7 @@
 #include "ResourceManager.h"
 #include "Renderer.h"
 #include "GameObject.h"
-#include "Transform.h"
+#include "TransformComponent.h"
 #include "Math2D.h"
 #include "GameObject.h"
 #include "GlobalMemoryPools.h"
@@ -28,12 +28,12 @@ void Texture2DComponent::Initialize()
 
 void Texture2DComponent::Render() const
 {
-	Transform& transform = m_pGameObject->GetWorldTransform();
-	const Vector2& pos = transform.GetPosition();
-	const Vector2& scale = transform.GetScale();
+	Transform& worldTrans = m_pGameObject->GetTransform().GetWorld();
+	const Vector2& pos = worldTrans.Position;
+	const Vector2& scale = worldTrans.Scale;
 	const Vector4& dstRect = m_pTexture->GetDestRect();
 	const Vector4& srcRect = m_pTexture->GetSourceRect();
-	Renderer::GetInstance().RenderTexture(m_pTexture->GetSDLTexture(), pos, dstRect, srcRect, scale, transform.GetRotation(), m_Pivot, m_pTexture->GetFlip() );
+	Renderer::GetInstance().RenderTexture(m_pTexture->GetSDLTexture(), pos, dstRect, srcRect, scale, worldTrans.Rotation, m_Pivot, m_pTexture->GetFlip() );
 
 	//DEPRECATED > general calculations and camera transformation(s) are handled in the Renderer
 	//Renderer::GetInstance().RenderTexture(m_pTexture->GetSDLTexture(), 

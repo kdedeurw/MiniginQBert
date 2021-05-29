@@ -54,7 +54,10 @@ void Scene::Update()
 	const size_t size = m_GameObjects.size();
 	if (m_AmountOfGameObjects != size) //detected change
 	{
-		std::sort(m_GameObjects.begin(), m_GameObjects.end(), [](GameObject* pObj, GameObject* pObj2)->bool { return pObj->GetWorldTransform().GetPosition().z > pObj2->GetWorldTransform().GetPosition().z; });
+		std::sort(m_GameObjects.begin(), m_GameObjects.end(), [](GameObject* pObj, GameObject* pObj2)->bool 
+			{
+				return pObj->GetTransform().GetWorld().Position.z > pObj2->GetTransform().GetWorld().Position.z;
+			});
 		m_AmountOfGameObjects = size;
 	}
 	for (size_t i{}; i < size; ++i)

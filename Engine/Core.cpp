@@ -132,7 +132,7 @@ void Core::AddFPSScene(float x, float y) const
 	GameObject* pGo = scene.CreateGameObject();
 	FPSComponent* pFPS = mp.CreateComponent<FPSComponent>();
 	pGo->AddComponent(pFPS);
-	pGo->GetLocalTransform().SetPosition(x, y);
+	pGo->GetTransform().SetPosition(x, y);
 }
 
 void Core::AddDemoScene() const
@@ -147,14 +147,14 @@ void Core::AddDemoScene() const
 	Texture2DComponent* pTex = gm.CreateComponent<Texture2DComponent>();
 	pTex->SetTexture("background.jpg");
 	pGo->AddComponent(pTex);
-	pGo->GetLocalTransform().Translate(pWi->Width / 2.f, pWi->Height / 2.f);
+	pGo->GetTransform().Translate(pWi->Width / 2.f, pWi->Height / 2.f);
 
 	//create logo
 	pGo = scene.CreateGameObject();
 	pTex = gm.CreateComponent<Texture2DComponent>();
 	pTex->SetTexture("logo.png");
 	pGo->AddComponent(pTex);
-	pGo->GetLocalTransform().Translate(pWi->Width / 2.f, pWi->Height / 2.f);
+	pGo->GetTransform().Translate(pWi->Width / 2.f, pWi->Height / 2.f);
 
 	//create text
 	pGo = scene.CreateGameObject();
@@ -168,7 +168,7 @@ void Core::AddDemoScene() const
 	int w{}, h{};
 	SDL_QueryTexture(pTc->GetTextureData()->GetSDLTexture(), nullptr, nullptr, &w, &h);
 
-	pGo->GetLocalTransform().Translate(pWi->Width / 2.f, (float)pWi->Height - h);
+	pGo->GetTransform().Translate(pWi->Width / 2.f, (float)pWi->Height - h);
 
 	pGo = scene.CreateGameObject();
 	pTc = gm.CreateComponent<TextComponent>();
@@ -179,7 +179,7 @@ void Core::AddDemoScene() const
 	pTc->Initialize(); //create texture data
 	SDL_QueryTexture(pTc->GetTextureData()->GetSDLTexture(), nullptr, nullptr, &w, &h);
 
-	pGo->GetLocalTransform().Translate(w / 2.f, h / 2.f);
+	pGo->GetTransform().Translate(w / 2.f, h / 2.f);
 }
 
 void Core::SetForceQuitKey(Key key)

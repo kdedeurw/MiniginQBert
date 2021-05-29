@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "FPSComponent.h"
 #include "GameObject.h"
-#include "Transform.h"
+#include "TransformComponent.h"
 
 #include <SDL.h>
 #include <SDL_ttf.h>
@@ -67,12 +67,12 @@ void FPSComponent::Update()
 
 void FPSComponent::Render() const
 {
-	Transform& trans = m_pGameObject->GetLocalTransform();
-	Vector2 pos = trans.GetPosition();
-	const float rot = trans.GetRotation();
+	Transform& worldTrans = m_pGameObject->GetTransform().GetWorld();
+	Vector2 pos = worldTrans.Position;
+	const float rot = worldTrans.Rotation;
 	const Vector4& srcRect = m_pTextureData->GetSourceRect();
 	const Vector4& dstRect = m_pTextureData->GetDestRect();
-	const Vector2& scale = trans.GetScale();
+	const Vector2& scale = worldTrans.Scale;
 	//TODO: define FPS 'corner' position and math (probs in Core::AddFPS) enum class?
 	pos.x += dstRect.z / 2;
 	pos.y -= dstRect.w / 2;

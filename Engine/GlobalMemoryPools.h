@@ -7,14 +7,13 @@
 
 #include "Scene.h"
 #include "GameObject.h"
-#include "Transform.h"
+#include "TransformComponent.h"
 #include "Texture2D.h"
 #include "Font.h"
 #include "Subject.h"
 
 //Include for access to project's memory pools
 //this memory is being cleaned up afterwards
-//TODO: removing memory run-time
 
 struct SDL_Texture;
 class Scene;
@@ -47,7 +46,7 @@ private:
 	StackAllocator m_StackAllocator;
 	FixedSizeAllocator<Scene> m_SceneAllocator;
 	FixedSizeAllocator<GameObject> m_GameObjectAllocator;
-	FixedSizeAllocator<Transform> m_TransformAllocator;
+	FixedSizeAllocator<TransformComponent> m_TransformAllocator;
 	FixedSizeAllocator<Texture2D> m_TextureAllocator;
 	FixedSizeAllocator<Font> m_FontAllocator;
 	FixedSizeAllocator<Subject> m_SubjectAllocator;

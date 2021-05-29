@@ -56,7 +56,7 @@ void TextComponent::Render() const
 {
 	if (m_pTextureData != nullptr)
 	{
-		const Vector3& pos = m_pGameObject->GetLocalTransform().GetPosition();
+		const Vector3& pos = m_pGameObject->GetTransform().GetWorld().Position;
 		Renderer::GetInstance().RenderText(m_pTextureData->GetSDLTexture(), pos.x, pos.y, m_Offset.x, m_Offset.y);
 	}
 }

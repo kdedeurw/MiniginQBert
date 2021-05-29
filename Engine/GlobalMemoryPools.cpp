@@ -82,7 +82,7 @@ Scene* GlobalMemoryPools::CreateScene(std::string name)
 
 GameObject* GlobalMemoryPools::CreateGameObject()
 {
-	return new (m_GameObjectAllocator) GameObject{ *new (m_TransformAllocator) Transform{}, *new (m_TransformAllocator) Transform{} };
+	return new (m_GameObjectAllocator) GameObject{ *new (m_TransformAllocator) TransformComponent{} };
 }
 
 Texture2D* GlobalMemoryPools::CreateTexture2D(SDL_Texture* pTexture)
