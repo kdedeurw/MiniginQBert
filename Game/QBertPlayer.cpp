@@ -1,26 +1,40 @@
 #include "pch.h"
 #include "QBertPlayer.h"
-#include <iostream>
-#include "GlobalInput.h"
+#include "KeyboardMouseListener.h"
 #include "GameObject.h"
 #include "Subject.h"
 #include "QBertEvents.h"
-#include "TextComponent.h"
+#include "Components.h"
+#include "GameState.h"
+#include "QBertTile.h"
+
+const float QBertPlayer::m_TextureSize = 16.f;
+
+enum class MovementState
+{
+	Ground,
+	Jump,
+};
+
+QBertPlayer::QBertPlayer()
+	: m_IsKilled{}
+	, m_PlayerId{ PlayerId::Player1 }
+	, m_pTexture{}
+	, m_MoveDelay{}
+{}
 
 QBertPlayer::~QBertPlayer()
 {
-	if (m_pSubject)
-		delete m_pSubject;
-	m_pSubject = nullptr;
 }
 
 void QBertPlayer::Initialize()
 {
-	if (m_pLifesDisplay)
-		m_pLifesDisplay->SetText("Player " + m_Name + "'s lifes: " + std::to_string(m_Stats.Lives));
+	if (!m_pTexture)
+		m_pTexture = m_pGameObject->GetComponent<Texture2DComponent>();
 
-	if (m_pScoreDisplay)
-		m_pScoreDisplay->SetText("Player " + m_Name + "'s score: " + std::to_string(m_Stats.Score));
+	m_pTexture->SetTexture("QBert/Sprites.png");
+	m_pTexture->SetTextureSize({ m_TextureSize, m_TextureSize });
+	m_pTexture->SetTextureOffset({m_TextureSize * 6, 0.f});
 }
 
 void QBertPlayer::Render() const
@@ -29,88 +43,44 @@ void QBertPlayer::Render() const
 
 void QBertPlayer::Update()
 {
-	if (m_Stats.Lives <= 0)
+	m_MoveDelay -= GameState::GetInstance().DeltaTime;
+
+	if (m_MoveDelay > 0.f)
 		return;
 
-	//dirty implementation
-	KeyboardMouseListener& km = GlobalInput::GetInstance().GetKeyboardMouseListener();
+	m_MoveDelay = 0.5f;
 
-	if (!m_IsKilled && km.IsPressed(m_KillButton))
+	const KeyboardMouseListener& kbml = KeyboardMouseListener::GetInstance();
+	TransformComponent& trans = m_pGameObject->GetTransform();
+	const float tileSize = QBertTile::GetTextureSize();
+	const Vector2& scale = trans.GetWorld().Scale;
+	if (kbml.IsPressed(Key::A))
 	{
-		m_IsKilled = true;
-		m_pSubject->Notify(GetGameObject(), (int)QbertEvent::event_player_die);
+		trans.Translate((-tileSize / 2) * scale.x, (-tileSize / 2 - m_TextureSize / 2) * scale.y);
+		m_pTexture->SetTextureOffset({ m_TextureSize * 6, 0.f });
 	}
-	else if (m_IsKilled && km.IsReleased(m_KillButton))
-		OnRespawn();
-
-	if (!m_HasScored && km.IsPressed(m_RandomPointsButton))
+	else if (kbml.IsPressed(Key::D))
 	{
-		m_HasScored = true;
-		m_pSubject->Notify(GetGameObject(), rand() % 4 + 1); //events are enum class ints
+		trans.Translate((tileSize / 2) * scale.x, (tileSize / 2 + m_TextureSize / 2) * scale.y);
+		m_pTexture->SetTextureOffset({ m_TextureSize * 0, 0.f });
 	}
-	else if (m_HasScored && km.IsReleased(m_RandomPointsButton))
-		OnScored();
-}
-
-void QBertPlayer::AddScore(int amount)
-{
-	m_Stats.Score += amount;
-
-	if (!m_pScoreDisplay)
+	if (kbml.IsPressed(Key::W))
 	{
-		std::cout << "No Score display!\n";
-		return;
+		trans.Translate((-tileSize / 2) * scale.x, (tileSize / 2 + m_TextureSize / 2) * scale.y);
+		m_pTexture->SetTextureOffset({ m_TextureSize * 2, 0.f });
 	}
-
-	m_pScoreDisplay->SetText("Player " + m_Name + "'s score: " + std::to_string(m_Stats.Score));
+	else if (kbml.IsPressed(Key::S))
+	{
+		trans.Translate((tileSize / 2) * scale.x, (-tileSize / 2 - m_TextureSize / 2) * scale.y);
+		m_pTexture->SetTextureOffset({ m_TextureSize * 4, 0.f });
+	}
 }
 
 void QBertPlayer::OnDeath()
 {
-	--m_Stats.Lives;
-	if (!m_pLifesDisplay)
-	{
-		std::cout << "No Lifes display!\n";
-		return;
-	}
-
-	if (m_Stats.Lives > 0)
-		m_pLifesDisplay->SetText("Player " + m_Name + "'s lifes: " + std::to_string(m_Stats.Lives));
-	else
-		m_pLifesDisplay->SetText("Player " + m_Name + " was defeated!");
+	m_pSubject->Notify(m_pGameObject, m_PlayerId);
 }
 
 void QBertPlayer::OnRespawn()
 {
-	std::cout << "Player " << m_Name << "'s " << "lives: " << m_Stats.Lives << '\n';
-	m_IsKilled = false;
-}
-
-void QBertPlayer::OnScored()
-{
-	std::cout << "Player " << m_Name << "'s " << "score: " << m_Stats.Score << '\n';
-	m_HasScored = false;
-}
-
-void QBertPlayer::SetKillButton(Key button)
-{
-	m_KillButton = button;
-}
-
-void QBertPlayer::SetName(const std::string& name)
-{
-	m_Name = name;
-}
-
-void QBertPlayer::SetRandomPointsButton(Key button)
-{
-	m_RandomPointsButton = button;
-}
-
-void QBertPlayer::SetSubject(Subject* pSubject, bool isOverwrite)
-{
-	if (!m_pSubject)
-		m_pSubject = pSubject;
-	else if (isOverwrite)
-		m_pSubject = pSubject;
 }

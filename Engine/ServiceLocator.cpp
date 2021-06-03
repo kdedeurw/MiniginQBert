@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ServiceLocator.h"
 #include "DebugSoundSystem.h"
 #include "SoundSystem.h"

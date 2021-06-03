@@ -28,6 +28,7 @@ GameObject* Scene::CreateGameObject()
 	pGameObject->m_Id = m_IdCounter;
 	++m_IdCounter;
 	m_GameObjects.push_back(pGameObject);
+	pGameObject->m_pScene = this;
 	return pGameObject;
 }
 

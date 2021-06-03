@@ -1,5 +1,4 @@
 #pragma once
-#include "GlobalMemoryPools.h"
 #include <string>
 #include <vector>
 
@@ -23,16 +22,14 @@ public:
 	bool operator==(const Scene& other) const;
 	bool operator==(Scene* pOther) const;
 
-
 private:
-	//friend Scene* GlobalMemoryPools::CreateScene(const std::string& name);
 	friend class GlobalMemoryPools;
 	explicit Scene(std::string name);
 
 	static unsigned int m_IdCounter;
 	size_t m_AmountOfGameObjects;
 
-	friend class SceneManager; //why not
+	friend class SceneManager;
 	std::string m_Name;
 	std::vector<GameObject*> m_GameObjects;
 };

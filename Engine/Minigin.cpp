@@ -1,39 +1,31 @@
 //Base includes
 #include "pch.h"
-#include "Core.h"
+#include "Minigin.h"
 #include <chrono>
 #include <thread>
 #include "Transform.h"
-#include "KeyboardMouseListener.h"
-#include "ControllerListener.h"
+#include "GlobalInput.h"
 #include "SceneManager.h"
 #include "Renderer.h"
 #include "ResourceManager.h"
+#include <SDL.h>
 #include "GameObject.h"
 #include "Scene.h"
-
-//SDL includes
-#include <SDL.h>
-#include <SDL_ttf.h>
-#include <SDL_image.h>
-#include <SDL_mixer.h>
 
 //Project includes
 #include "Timer.h"
 #include "Components.h"
 #include "GameState.h"
-#include "ServiceLocator.h"
-#include "SoundSystem.h"
 
-using namespace Engine2D;
+using namespace std;
+using namespace std::chrono;
 
-Core::Core(const char* pTitle, int w, int h, int msPF)
-	: m_WindowInfo{ pTitle, w, h, msPF }
-	, m_pWindow{}
-	, m_AudioThread{}
+dae::Minigin::Minigin(const char* pTitle, int w, int h, int msPF)
+	: m_QuitKey{ Key::Escape }
+	, m_WindowInfo{ pTitle, w, h, msPF }
 {
-	//set random seed
-	srand((unsigned int)time(NULL));
+	//initialize random seed
+	//srand((unsigned int)time(NULL));
 
 	// tell the resource manager where he can find the game data
 	ResourceManager::GetInstance().Init("../Resources/");
@@ -41,17 +33,16 @@ Core::Core(const char* pTitle, int w, int h, int msPF)
 	GameState::GetInstance().pWindowInfo = &m_WindowInfo;
 }
 
-Core::~Core()
+dae::Minigin::~Minigin()
 {}
 
-void Core::Init()
+void dae::Minigin::StartUp()
 {
 	InitializeSDL();
-
-	ServiceLocator::RegisterSoundSystem(new SoundSystem{});
+	Initialize();
 }
 
-void Core::InitializeSDL()
+void dae::Minigin::InitializeSDL()
 {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) 
 	{
@@ -66,7 +57,7 @@ void Core::InitializeSDL()
 		m_WindowInfo.Height,
 		SDL_WINDOW_OPENGL
 	);
-	if (!m_pWindow) 
+	if (m_pWindow == nullptr) 
 	{
 		throw std::runtime_error(std::string("SDL_CreateWindow Error: ") + SDL_GetError());
 	}
@@ -74,27 +65,30 @@ void Core::InitializeSDL()
 	Renderer::GetInstance().Init(m_pWindow);
 }
 
-void Core::Cleanup()
+void dae::Minigin::Initialize()
+{
+	SceneManager::GetInstance().Initialize();
+}
+
+void dae::Minigin::Cleanup()
 {
 	SDL_DestroyWindow(m_pWindow);
 	m_pWindow = nullptr;
-
-	delete ServiceLocator::GetSoundSystem();
-
 	SDL_Quit();
 }
 
-bool Core::ProcessInputs()
+bool dae::Minigin::ProcessInputs()
 {
-	KeyboardMouseListener& kbml = KeyboardMouseListener::GetInstance();
-	ControllerListener& cl = ControllerListener::GetInstance();
+	GlobalInput& im = GlobalInput::GetInstance();
 
-	cl.ProcessInput();
+	im.GetKeyboardMouseListener().ProcessInput();
+	im.GetControllerListener().ProcessInput();
 
-	return kbml.ProcessInput();
+	//return im.GetKeyboardMouseListener().IsQuit();
+	return im.GetKeyboardMouseListener().IsPressed(m_QuitKey);
 }
 
-void Core::Run()
+void dae::Minigin::Run()
 {
 	SceneManager& sm = SceneManager::GetInstance();
 	Renderer& renderer = Renderer::GetInstance();
@@ -115,12 +109,12 @@ void Core::Run()
 	Cleanup();
 }
 
-void Core::ForceQuit()
+void dae::Minigin::ForceQuit()
 {
 	m_IsQuit = true;
 }
 
-void Core::AddFPSScene(float x, float y) const
+void dae::Minigin::AddFPSScene(float x, float y) const
 {
 	SceneManager& sm = SceneManager::GetInstance();
 	GlobalMemoryPools& mp = GlobalMemoryPools::GetInstance();
@@ -129,10 +123,10 @@ void Core::AddFPSScene(float x, float y) const
 	GameObject* pGo = scene.CreateGameObject();
 	FPSComponent* pFPS = mp.CreateComponent<FPSComponent>();
 	pGo->AddComponent(pFPS);
-	pGo->GetTransform().SetPosition(x, y);
+	pGo->GetLocalTransform().SetPosition(x, y);
 }
 
-void Core::AddDemoScene() const
+void dae::Minigin::AddDemoScene() const
 {
 	Scene& scene = SceneManager::GetInstance().CreateScene("Demo");
 	GlobalMemoryPools& gm = GlobalMemoryPools::GetInstance();
@@ -144,14 +138,14 @@ void Core::AddDemoScene() const
 	Texture2DComponent* pTex = gm.CreateComponent<Texture2DComponent>();
 	pTex->SetTexture("background.jpg");
 	pGo->AddComponent(pTex);
-	pGo->GetTransform().Translate(pWi->Width / 2.f, pWi->Height / 2.f);
+	pGo->GetLocalTransform().Translate(pWi->Width / 2.f, pWi->Height / 2.f);
 
 	//create logo
 	pGo = scene.CreateGameObject();
 	pTex = gm.CreateComponent<Texture2DComponent>();
 	pTex->SetTexture("logo.png");
 	pGo->AddComponent(pTex);
-	pGo->GetTransform().Translate(pWi->Width / 2.f, pWi->Height / 2.f);
+	pGo->GetLocalTransform().Translate(pWi->Width / 2.f, pWi->Height / 2.f);
 
 	//create text
 	pGo = scene.CreateGameObject();
@@ -160,17 +154,19 @@ void Core::AddDemoScene() const
 	pTc->SetText("Programming 4 Assignment");
 	pTc->SetFont(pFont);
 	pGo->AddComponent(pTc);
+	pGo->GetLocalTransform().Translate(80.f, pWi->Height - 20.f);
 
-	pTc->Initialize(); //create texture data
-	int w{}, h{};
-	SDL_QueryTexture(pTc->GetTextureData()->GetSDLTexture(), nullptr, nullptr, &w, &h);
-
-	pGo->GetTransform().Translate(pWi->Width / 2.f, (float)pWi->Height - h);
+	pGo = scene.CreateGameObject();
+	pTc = gm.CreateComponent<TextComponent>();
+	pTc->SetText("Press Esc to exit");
+	pTc->SetFont(pFont);
+	pGo->AddComponent(pTc);
+	pGo->GetLocalTransform().Translate(80.f, 50.f);
 }
 
-void Engine2D::Core::SetRandSeed(unsigned int seed)
+void dae::Minigin::SetForceQuitKey(Key key)
 {
-	srand(seed);
+	m_QuitKey = key;
 }
 
 /*

@@ -1,49 +1,29 @@
 #pragma once
-#include <Component.h>
+#include "QBertEntity.h"
 #include <string>
 
-struct PlayerStats
-{
-	int Lives = 3;
-	int Score = 0;
-};
-
-enum class Key;
-class Subject;
-class TextComponent;
-class QBertPlayer final : public Component
+class Texture2DComponent;
+enum PlayerId : int;
+class QBertPlayer final : public QBertEntity
 {
 public:
-	QBertPlayer() = default;
-	virtual ~QBertPlayer();
+	QBertPlayer();
+	~QBertPlayer();
 
 	void Initialize() override;
 	void Render() const override;
 	void Update() override;
 
-	const PlayerStats& GetStats() const { return m_Stats; };
-	void AddScore(int amount);
 	void OnDeath();
 	void OnRespawn();
-	void OnScored();
 
-	void SetKillButton(Key button);
-	void SetName(const std::string& name);
-	void SetRandomPointsButton(Key button);
-
-	void SetSubject(Subject* pSubject, bool isOverwrite = false);
-	Subject* GetSubject() const { return m_pSubject; };
-
-	void SetLivesDisplay(TextComponent* pTc) { m_pLifesDisplay = pTc; };
-	void SetScoreDisplay(TextComponent* pTc) { m_pScoreDisplay = pTc; };
+	static float GetTextureSize() { return m_TextureSize; }
 
 private:
-	TextComponent* m_pLifesDisplay;
-	TextComponent* m_pScoreDisplay;
-	Subject* m_pSubject;
-	bool m_IsKilled = false, m_HasScored = false;
-	PlayerStats m_Stats;
-	std::string m_Name = "QBert";
-	Key m_KillButton;
-	Key m_RandomPointsButton;
+	bool m_IsKilled;
+	float m_MoveDelay;
+	PlayerId m_PlayerId;
+	Texture2DComponent* m_pTexture;
+
+	static const float m_TextureSize;
 };

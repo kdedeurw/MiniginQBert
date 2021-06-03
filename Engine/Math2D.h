@@ -1,4 +1,5 @@
 #pragma once
+#include <math.h>
 
 struct Vector2;
 struct Vector3;

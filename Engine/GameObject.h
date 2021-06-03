@@ -3,6 +3,7 @@
 
 class Component;
 class TransformComponent;
+class Scene;
 class GameObject final
 {
 public:
@@ -18,6 +19,7 @@ public:
 
 	TransformComponent& GetTransform() const { return m_Transform; }
 	GameObject& GetParent() const { return *m_pParent; }
+	Scene& GetScene() const { return *m_pScene; }
 
 	const unsigned int GetId() const { return m_Id; }
 
@@ -38,6 +40,7 @@ public:
 private:
 	friend class Scene;
 	unsigned int m_Id;
+	Scene* m_pScene;
 
 	bool m_IsActive, m_IsRendered;
 	TransformComponent& m_Transform;
@@ -53,10 +56,11 @@ private:
 template <typename T>
 T* GameObject::GetComponent() const
 {
+	const type_info& typeInfo = typeid(T);
 	for (Component* pComponent : m_pComponents)
 	{
-		if (typeid(*pComponent) == typeid(T))
-			return dynamic_cast<T*>(pComponent);
+		if (typeid(*pComponent) == typeInfo)
+			return static_cast<T*>(pComponent);
 	}
 	return nullptr;
 }

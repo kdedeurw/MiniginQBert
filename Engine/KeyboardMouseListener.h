@@ -67,8 +67,7 @@ public:
 	//friend class GlobalInput;
 	~KeyboardMouseListener();
 
-	bool IsQuit() const;
-	virtual void ProcessInput() override;
+	virtual bool ProcessInput() override;
 	virtual bool IsAction(Action action) const override;
 	bool IsPressed(Key key) const;
 	bool IsReleased(Key key) const { return !IsPressed(key); };
@@ -92,7 +91,6 @@ private:
 	friend static KeyboardMouseListener& SingletonRef<KeyboardMouseListener>::GetInstance();
 	KeyboardMouseListener();
 
-	bool m_IsQuit;
 	bool m_IsMouseMoved;
 	int m_ScrollWheel;
 	Vector2 m_MousePos;

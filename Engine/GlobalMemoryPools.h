@@ -59,11 +59,11 @@ private:
 template<typename T>
 T* GlobalMemoryPools::CreateComponent()
 {
-	return new (m_ComponentAllocator) T;
+	return new (m_ComponentAllocator) T{};
 }
 
 template<typename T>
 T* GlobalMemoryPools::CreateOnStack()
 {
-	return new (m_StackAllocator) T;
+	return new (m_StackAllocator) T{};
 }

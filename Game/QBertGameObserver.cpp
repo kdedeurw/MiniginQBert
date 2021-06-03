@@ -5,39 +5,38 @@
 #include "GameObject.h"
 #include "QBertPlayer.h"
 
+QBertGameObserver::QBertGameObserver()
+{
+}
+
+QBertGameObserver::~QBertGameObserver()
+{
+}
+
 void QBertGameObserver::OnNotify(GameObject* pGameObject, int event)
 {
-	QbertEvent e = (QbertEvent)event;
 	QBertPlayer* pPlayer = pGameObject->GetComponent<QBertPlayer>();
-	switch (e)
+	switch ((QBertEvent)event)
 	{
-	case QbertEvent::event_player_die:
-		std::cout << "PlayerDied\n";
+	case QBertEvent::event_player1_die:
 		if (pPlayer)
-			pPlayer->OnDeath(); //notifies the gameobject responsible for UI
+			pPlayer->OnDeath();
 		break;
-	case QbertEvent::event_colour_change:
-		std::cout << "Colour changed!\n";
-		if (pPlayer)
-			pPlayer->AddScore(25);
+	case QBertEvent::event_player2_die:
 		break;
-	case QbertEvent::event_enemy_coily_killed:
-		std::cout << "Coily killed!\n";
-		if (pPlayer)
-			pPlayer->AddScore(500);
+	case QBertEvent::event_tile_colour_change_intermediate:
 		break;
-	case QbertEvent::event_slick_catched:
-		std::cout << "Slick catched!\n";
-		if (pPlayer)
-			pPlayer->AddScore(300);
+	case QBertEvent::event_tile_colour_change_final:
 		break;
-	case QbertEvent::event_sam_catched:
-		std::cout << "Sam catched!\n";
-		if (pPlayer)
-			pPlayer->AddScore(300);
+	case QBertEvent::event_green_ball_catched:
+		break;
+	case QBertEvent::event_coily_killed:
+		break;
+	case QBertEvent::event_slick_catched:
+		break;
+	case QBertEvent::event_sam_catched:
 		break;
 	default:
-		std::cout << "Wrong event\n";
 		break;
 	}
 }

@@ -2,8 +2,7 @@
 #include <map>
 #include <windows.h>
 
-class Command;
-
+#pragma warning(disable : 26812)
 enum PlayerId
 {
 	Player1,
@@ -35,12 +34,13 @@ enum class Action
 	Down,
 };
 
+class Command;
 class InputManager
 {
 public:
 	virtual ~InputManager();
 
-	virtual void ProcessInput() = 0;
+	virtual bool ProcessInput() = 0;
 	virtual bool IsAction(Action action) const = 0;
 	virtual Command* HandleInput(PlayerId playerId = PlayerId::KeyboardAndMouse) const = 0;
 

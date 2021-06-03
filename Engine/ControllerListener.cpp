@@ -25,7 +25,7 @@ ControllerListener::~ControllerListener()
     //reset controller's vibration
 }
 
-void ControllerListener::ProcessInput()
+bool ControllerListener::ProcessInput()
 {
     //memset(&state,0,sizeof(XINPUT_STATE)); ==
     //RtlZeroMemory(&state, sizeof(XINPUT_STATE)); ==
@@ -59,6 +59,7 @@ void ControllerListener::ProcessInput()
             //ZeroMemory(&controllerStates[i], sizeof(XINPUT_STATE));
         }
     }
+    return false;
 }
 
 void ControllerListener::ProcessInputLegacy()

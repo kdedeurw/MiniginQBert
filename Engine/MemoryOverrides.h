@@ -1,5 +1,6 @@
 #pragma once
 // overload global new and delete.
+#pragma warning(disable : 28251)
 
 namespace CustomMemoryAllocator
 {

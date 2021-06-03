@@ -18,7 +18,6 @@ KeyboardMouseListener::KeyboardMouseListener()
 	, m_ActionToMouseButtonBindings{}
 	, m_ActionToScrollWheelBindings{}
 	, m_KeyboardMouseBindings{}
-	, m_IsQuit{}
 {
 	InitializeKeys();
 	InitializeMouseButtons();
@@ -29,12 +28,7 @@ KeyboardMouseListener::KeyboardMouseListener()
 KeyboardMouseListener::~KeyboardMouseListener()
 {}
 
-bool KeyboardMouseListener::IsQuit() const
-{
-	return m_IsQuit;
-}
-
-void KeyboardMouseListener::ProcessInput()
+bool KeyboardMouseListener::ProcessInput()
 {
 	m_IsMouseMoved = false;
 	m_ScrollWheel = 0;
@@ -45,7 +39,7 @@ void KeyboardMouseListener::ProcessInput()
 		switch (e.type)
 		{
 		case SDL_QUIT:
-			m_IsQuit = true;
+			return true;
 			break;
 		case SDL_KEYDOWN:
 			HandleKeyEvent(e.key, true);
@@ -67,6 +61,7 @@ void KeyboardMouseListener::ProcessInput()
 			break;
 		}
     }
+	return false;
 }
 
 void KeyboardMouseListener::HandleKeyEvent(SDL_KeyboardEvent& e, bool isPressed)

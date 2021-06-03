@@ -65,7 +65,7 @@ class ControllerListener final : public InputManager, public SingletonRef<Contro
 public:
 	~ControllerListener();
 
-	virtual void ProcessInput() override;
+	virtual bool ProcessInput() override;
 	virtual bool IsAction(Action action) const override;
 
 	void ProcessInputLegacy();

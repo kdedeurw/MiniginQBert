@@ -1,4 +1,3 @@
-#define NOMINMAX
 #include "pch.h"
 #include "Collision2D.h"
 #include <algorithm>
