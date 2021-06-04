@@ -1,9 +1,11 @@
 #include "pch.h"
 #include "ControllerListener.h"
-
 #include "Commands.h"
 #include <set>
 #include "Math2D.h"
+
+#pragma warning(disable:33011)
+#pragma warning(disable:6001)
 
 ControllerListener::ControllerListener()
     : m_ConnectedControllers{}
@@ -14,8 +16,6 @@ ControllerListener::ControllerListener()
     , m_ControllerBindings{}
 {
     RegisterControllers();
-
-    //SetActionBinding(Action::Swapweapons, Button::A);
 }
 
 ControllerListener::~ControllerListener()
@@ -27,20 +27,15 @@ ControllerListener::~ControllerListener()
 
 bool ControllerListener::ProcessInput()
 {
-    //memset(&state,0,sizeof(XINPUT_STATE)); ==
-    //RtlZeroMemory(&state, sizeof(XINPUT_STATE)); ==
-    //ZeroMemory(&state, sizeof(XINPUT_STATE));
-
     //dwPacketNumber is increased everytime the controller changes input!
     //todo: comparison between number of every former and current frame
-
-    // todo: read the input
-    //flush current controller states
-    ZeroMemory(m_ControllerStates, sizeof(XINPUT_STATE) * m_ConnectedControllers);
 
     DWORD dwStateResult;
     for (DWORD i = 0; i < (DWORD)m_ConnectedControllers; i++)
     {
+        //flush current controller states
+        //ZeroMemory(&m_ControllerStates[i], sizeof(XINPUT_STATE));
+
         XINPUT_STATE state;
         dwStateResult = XInputGetState(i, &state);
 
@@ -49,14 +44,11 @@ bool ControllerListener::ProcessInput()
             // Controller is connected
             // Only then store state result
             m_ControllerStates[i] = std::move(state);
-
-            //if (controllerStates[i].Gamepad.wButtons == XINPUT_GAMEPAD_START)
-            //    RegisterControllers();
         }
         else
         {
             // Controller is not connected
-            //ZeroMemory(&controllerStates[i], sizeof(XINPUT_STATE));
+            ZeroMemory(&m_ControllerStates[i], sizeof(XINPUT_STATE));
         }
     }
     return false;
@@ -202,9 +194,39 @@ bool ControllerListener::IsMovingLegacy(Movable movable, ControllerId id) const
     return false;
 }
 
+float ControllerListener::GetTriggerValue(bool isLeft, ControllerId id) const
+{
+    if (isLeft)
+        return m_ControllerStates[(int)id].Gamepad.bLeftTrigger / 255.f;
+    return m_ControllerStates[(int)id].Gamepad.bRightTrigger / 255.f;
+}
+
+Vector2 ControllerListener::GetThumbStickValue(bool isLeft, ControllerId id) const
+{
+    Vector2 thumbStick{};
+    if (isLeft)
+    {
+        if (IsMoving(Movable::ThumbstickLeft, id))
+        {
+            thumbStick.x = m_ControllerStates[(int)id].Gamepad.sThumbLX / 65535.f;
+            thumbStick.y = m_ControllerStates[(int)id].Gamepad.sThumbLY / 65535.f;
+        }
+    }
+    else
+    {
+        if (IsMoving(Movable::ThumbstickRight, id))
+        {
+            thumbStick.x = m_ControllerStates[(int)id].Gamepad.sThumbRX / 65535.f;
+            thumbStick.y = m_ControllerStates[(int)id].Gamepad.sThumbRY / 65535.f;
+        }
+    }
+    return thumbStick;
+}
+
 Command* ControllerListener::HandleInput(PlayerId id) const
 {
-    //todo: use bitmask switch statement
+    //TODO: use bitmask switch statement
+    //TODO: return vector of Commands
 
     switch (m_ControllerStates[id].Gamepad.wButtons)
     {

@@ -5,12 +5,17 @@
 #include "GameState.h"
 #include "QBertTile.h"
 #include "QBertPlayer.h"
+#include "Math2D.h"
+#include "Renderer.h"
+#include "QBertGameObserver.h"
 
 QBertLevel::QBertLevel()
 	: m_Round{}
 	, m_Level{}
+	, m_TargetTiles{}
 	, m_LevelReader{ "Resources/QBertLevels.txt" }
 	, m_pTiles{}
+	, m_pObserver{}
 {
 	m_pTiles.reserve(28);
 }
@@ -21,18 +26,21 @@ QBertLevel::~QBertLevel()
 
 void QBertLevel::Initialize()
 {
+	//TODO: fix
+	QBertEntity::m_pLevel = this;
+
 	//TODO: read level from file
 	//const QBertLevelData& level = m_LevelReader.ReadNextLevel();
 
-	//TODO: link tiles together
+	m_pObserver = GlobalMemoryPools::GetInstance().CreateOnStack<QBertGameObserver>();
 
 	const Vector2 scale{ 2.f, 2.f };
-	int delimiter = m_TileRow;
+	int delimiter = m_MaxTileRow;
 	const float tileSize = QBertTile::GetTextureSize();
 	float totalX{ tileSize };
 	float totalY{};
 
-	for (int j{}; j < m_TileRow; ++j)
+	for (int j{}; j < m_MaxTileRow; ++j)
 	{
 		for (int i{}; i < delimiter; ++i)
 		{
@@ -41,7 +49,6 @@ void QBertLevel::Initialize()
 			pTile->GetTransform().SetScale(scale);
 
 			GetGameObject()->AddChildObject(pTile);
-			m_pTiles.push_back(pTile->GetComponent<QBertTile>());
 		}
 		totalY -= tileSize / 4;
 		totalX += tileSize / 2;
@@ -52,32 +59,79 @@ void QBertLevel::Initialize()
 
 	const float playerSize = QBertPlayer::GetTextureSize();
 	GameObject* pPlayer = CreatePlayer();
-	pPlayer->GetTransform().SetPosition((tileSize * 3 + tileSize / 2 + playerSize / 2) * scale.x, (tileSize * 6 + playerSize / 2) * scale.y);
+	pPlayer->GetTransform().SetPosition((tileSize * 3 + tileSize / 2) * scale.x + playerSize / scale.x, (tileSize * 6) * scale.y + (playerSize / 2) * scale.y);
 	pPlayer->GetTransform().SetScale(scale);
 	GetGameObject()->AddChildObject(pPlayer);
 }
 
-void QBertLevel::Render() const
+void QBertLevel::PostRender() const
 {
+	for (QBertTile* pTile : m_pTiles)
+	{
+		const Vector2& scale = pTile->m_pGameObject->GetTransform().GetWorld().Scale;
+		const QBertTile::Neighbours& neighBours = pTile->GetNeighbours();
+		if (neighBours.pLeftTopNeighbour)
+		{
+			Renderer::GetInstance().DrawLine(pTile->m_pGameObject->GetTransform().GetWorld().Position,
+				neighBours.pLeftTopNeighbour->m_pGameObject->GetTransform().GetWorld().Position, RGBAColour{ 255, 0, 0, 128 });
+		}
+		if (neighBours.pRightTopNeighbour)
+		{
+			Renderer::GetInstance().DrawLine(pTile->m_pGameObject->GetTransform().GetWorld().Position,
+				neighBours.pRightTopNeighbour->m_pGameObject->GetTransform().GetWorld().Position, RGBAColour{ 255, 0, 0, 128 });
+		}
+		if (neighBours.pRightBottomNeighbour)
+		{
+			Renderer::GetInstance().DrawLine(pTile->m_pGameObject->GetTransform().GetWorld().Position,
+				neighBours.pRightBottomNeighbour->m_pGameObject->GetTransform().GetWorld().Position, RGBAColour{ 255, 0, 0, 128 });
+		}
+		if (neighBours.pLeftBottomNeighbour)
+		{
+			Renderer::GetInstance().DrawLine(pTile->m_pGameObject->GetTransform().GetWorld().Position,
+				neighBours.pLeftBottomNeighbour->m_pGameObject->GetTransform().GetWorld().Position, RGBAColour{ 255, 0, 0, 128 });
+		}
+
+		Renderer::GetInstance().DrawPoint(pTile->m_pGameObject->GetTransform().GetWorld().Position, scale.x, RGBAColour{ 0, 255, 0, 128 });
+	}
 }
 
 void QBertLevel::Update()
 {
-	//TODO: update tiles/store player's and enemies' pos
-	m_TestTimer -= GameState::GetInstance().DeltaTime;
-	if (m_TestTimer <= 0.f)
-	{
-		for (QBertTile* pTile : m_pTiles)
-		{
-			pTile->UpdateState(m_CurrentState);
-		}
+}
 
-		int nextState = ((int)m_CurrentState + 1);
-		if (nextState > 2)
-			nextState = 0;
-		m_CurrentState = (State)nextState;
-		m_TestTimer = 1.f;
+void QBertLevel::JumpOnTile(int tileId)
+{
+	tileId = Math2D::Clamp(tileId, 0, m_MaxTiles);
+
+	QBertTile* pTile = m_pTiles[tileId];
+
+	TileState state = pTile->GetState();
+	state = EvaluateNextState(state);
+	pTile->UpdateState(state);
+}
+
+QBertTile* QBertLevel::GetTile(int tileId) const
+{
+	tileId = Math2D::Clamp(tileId, 0, m_MaxTiles);
+	return m_pTiles[tileId];
+}
+
+TileState QBertLevel::EvaluateNextState(TileState state)
+{
+	//TODO: level difficulty
+
+	switch (state)
+	{
+	case TileState::DefaultState:
+		return TileState::IntermediateState;
+	case TileState::IntermediateState:
+		++m_TargetTiles;
+		return TileState::TargetState;
+	case TileState::TargetState:
+		--m_TargetTiles;
+		return TileState::IntermediateState;
 	}
+	return TileState::DefaultState;
 }
 
 GameObject* QBertLevel::CreateTile()
@@ -91,7 +145,13 @@ GameObject* QBertLevel::CreateTile()
 	QBertTile* pTile = gm.CreateComponent<QBertTile>();
 	pGo->AddComponent(pTile);
 
+	pTile->GetSubject()->AddObserver(m_pObserver);
+
+	pTile->m_Id = static_cast<short>(m_pTiles.size());
+
 	pGo->Initialize();
+
+	m_pTiles.push_back(pTile);
 
 	return pGo;
 }
@@ -106,6 +166,8 @@ GameObject* QBertLevel::CreatePlayer()
 
 	QBertPlayer* pPlayer = gm.CreateComponent<QBertPlayer>();
 	pGo->AddComponent(pPlayer);
+	
+	pPlayer->GetSubject()->AddObserver(m_pObserver);
 
 	pGo->Initialize();
 
@@ -123,56 +185,49 @@ void QBertLevel::ConnectTiles()
 	//RightBottom = i - currRowSize
 	//LeftBottom = i - currRowSize - 1
 
-	//int currRowSize = m_TileRow;
-	//int relativeTile = 0;
-	//for (int currTileIdx{}; currTileIdx < m_MaxTiles; ++currTileIdx)
-	//{
-	//	 QBertTile* pTile = m_pTiles[currTileIdx];
-	//
-	//	 const int lowerRowMin = GetLowerRow(currRowSize);
-	//	 const int lowerRowMax = GetLowerRow(currRowSize);
-	//	 const int upperRowMin = GetUpperRow(currRowSize);
-	//	 const int upperRowMax = GetUpperRow(currRowSize);
-	//
-	//	 int leftTopIdx = currTileIdx + currRowSize - 1;
-	//	 if (leftTopIdx < m_MaxTiles && leftTopIdx > upperRow)
-	//	 {
-	//		 pTile->m_pNeighbours[0] = m_pTiles[leftTopIdx];
-	//	 }
-	//
-	//	 int rightTopIdx = currTileIdx + currRowSize;
-	//	 if (rightTopIdx < m_MaxTiles && rightTopIdx > upperRow)
-	//	 {
-	//		 pTile->m_pNeighbours[1] = m_pTiles[rightTopIdx];
-	//	 }
-	//
-	//	 int rightBottomIdx = currTileIdx - currRowSize;
-	//	 if (rightBottomIdx >= 0 && rightBottomIdx < lowerRow)
-	//	 {
-	//		 pTile->m_pNeighbours[2] = m_pTiles[rightBottomIdx];
-	//	 }
-	//
-	//	 int leftBottomIdx = currTileIdx - currRowSize - 1;
-	//	 if (leftBottomIdx >= 0 && leftBottomIdx < lowerRow)
-	//	 {
-	//		 pTile->m_pNeighbours[3] = m_pTiles[leftBottomIdx];
-	//	 }
-	//
-	//	 //currRowSize = 7 > 6 > 5 > 4 > 3 > 2 > 1
-	//	 ++relativeTile;
-	//	 if (relativeTile >= currRowSize)
-	//	 {
-	//		 --currRowSize;
-	//		 relativeTile = 0;
-	//	 }
-	//}
+	int currRowSize = m_MaxTileRow;
+	int relativeTile = 0;
+	for (int currTileIdx{}; currTileIdx < m_MaxTiles; ++currTileIdx)
+	{
+		QBertTile* pTile = m_pTiles[currTileIdx];
+
+		const int lowerRowMin = GetLowerRowMin(currRowSize);
+		const int lowerRowMax = GetLowerRowMax(currRowSize);
+		const int upperRowMin = GetUpperRowMin(currRowSize);
+		const int upperRowMax = GetUpperRowMax(currRowSize);
+
+		int leftTopIdx = currTileIdx + currRowSize - 1;
+		if (leftTopIdx >= upperRowMin && leftTopIdx <= upperRowMax)
+			pTile->m_Neighbours.pLeftTopNeighbour = m_pTiles[leftTopIdx];
+
+		int rightTopIdx = currTileIdx + currRowSize;
+		if (rightTopIdx >= upperRowMin && rightTopIdx <= upperRowMax)
+			pTile->m_Neighbours.pRightTopNeighbour = m_pTiles[rightTopIdx];
+
+		int rightBottomIdx = currTileIdx - currRowSize;
+		if (rightBottomIdx >= lowerRowMin && rightBottomIdx <= lowerRowMax)
+			pTile->m_Neighbours.pRightBottomNeighbour = m_pTiles[rightBottomIdx];
+
+		int leftBottomIdx = currTileIdx - currRowSize - 1;
+		if (leftBottomIdx >= lowerRowMin && leftBottomIdx <= lowerRowMax)
+			pTile->m_Neighbours.pLeftBottomNeighbour = m_pTiles[leftBottomIdx];
+
+		//currRowSize = 7 > 6 > 5 > 4 > 3 > 2 > 1
+		++relativeTile;
+		if (relativeTile >= currRowSize)
+		{
+			--currRowSize;
+			relativeTile = 0;
+		}
+	}
 }
 
-int QBertLevel::GetLowerRow(int currRowSize) const
+int QBertLevel::GetLowerRowMin(int currRowSize) const
 {
 	int total{};
-	int rowSize = m_TileRow;
+	int rowSize = m_MaxTileRow;
 
+	currRowSize = Math2D::Clamp(currRowSize + 1, 0, m_MaxTileRow);
 	while (rowSize > currRowSize)
 	{
 		total += rowSize;
@@ -181,11 +236,39 @@ int QBertLevel::GetLowerRow(int currRowSize) const
 	return total;
 }
 
-int QBertLevel::GetUpperRow(int currRowSize) const
+int QBertLevel::GetLowerRowMax(int currRowSize) const
 {
 	int total{};
-	int rowSize = m_TileRow;
+	int rowSize = m_MaxTileRow;
 
+	while (rowSize > currRowSize)
+	{
+		total += rowSize;
+		--rowSize;
+	}
+	--total;
+	return total;
+}
+
+int QBertLevel::GetUpperRowMin(int currRowSize) const
+{
+	int total{};
+	int rowSize = m_MaxTileRow;
+
+	while (rowSize >= currRowSize)
+	{
+		total += rowSize;
+		--rowSize;
+	}
+	return total;
+}
+
+int QBertLevel::GetUpperRowMax(int currRowSize) const
+{
+	int total{};
+	int rowSize = m_MaxTileRow;
+
+	currRowSize = Math2D::Clamp(currRowSize - 1, 0, currRowSize);
 	while (rowSize >= currRowSize)
 	{
 		total += rowSize;

@@ -16,6 +16,7 @@ public:
 	virtual void Initialize();
 	virtual void Update();
 	virtual void Render() const;
+	virtual void PostRender() const;
 
 	TransformComponent& GetTransform() const { return m_Transform; }
 	GameObject& GetParent() const { return *m_pParent; }

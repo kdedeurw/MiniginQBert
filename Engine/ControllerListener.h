@@ -3,6 +3,7 @@
 #include "SingletonRef.h"
 #include <Xinput.h>
 #pragma comment(lib, "XInput.lib")
+#include "Vectors.h"
 
 #define XINPUT_LOW_MOTOR_INPUT WORD(65535 * 0.25f);
 #define XINPUT_MED_MOTOR_INPUT WORD(65535 * 0.5f);
@@ -10,16 +11,6 @@
 
 #define XINPUT_MAX_MOTOR_INPUT (WORD)65535
 
-struct Joystick
-{
-	Joystick(float x_, float y_)
-		: x {x_}
-		, y {y_}
-	{
-	}
-	float x;
-	float y;
-};
 enum ControllerId
 {
 	Controller1,
@@ -73,7 +64,9 @@ public:
 	bool IsPressedLegacy(Button button, ControllerId id = ControllerId::Controller1) const;
 	bool IsMoving(Movable movable, ControllerId id = ControllerId::Controller1) const;
 	bool IsMovingLegacy(Movable movable, ControllerId id = ControllerId::Controller1) const;
-	//TODO: return thumbstick values
+
+	float GetTriggerValue(bool isLeft = true, ControllerId id = ControllerId::Controller1) const;
+	Vector2 GetThumbStickValue(bool isLeft = true, ControllerId id = ControllerId::Controller1) const;
 
 	virtual Command* HandleInput(PlayerId playerId = PlayerId::Player1) const override;
 

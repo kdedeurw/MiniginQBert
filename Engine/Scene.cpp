@@ -76,6 +76,14 @@ void Scene::Render() const
 	}
 }
 
+void Scene::PostRender() const
+{
+	for (GameObject* pObject : m_GameObjects)
+	{
+		pObject->PostRender();
+	}
+}
+
 bool Scene::operator==(const Scene& other) const
 {
 	return m_Name == other.m_Name;

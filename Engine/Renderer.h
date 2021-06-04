@@ -16,7 +16,9 @@ public:
 	void Destroy();
 
 	void DrawPoint(float x, float y, RGBAColour colour = RGBAColour{ 255, 255, 255, 255 }, bool isCameraTransformations = true) const;
-	void DrawPoint(Vector2 pos, RGBAColour colour = RGBAColour{ 255, 255, 255, 255 }, bool isCameraTransformations = true) const { DrawPoint(std::move(pos.x), std::move(pos.y), colour, isCameraTransformations); };
+	void DrawPoint(Vector2 pos, RGBAColour colour = RGBAColour{ 255, 255, 255, 255 }, bool isCameraTransformations = true) const { DrawPoint(std::move(pos.x), std::move(pos.y), std::move(colour), isCameraTransformations); };
+	void DrawPoint(float x, float y, float size = 1.f, RGBAColour colour = RGBAColour{ 255, 255, 255, 255 }, bool isCameraTransformations = true) const;
+	void DrawPoint(Vector2 pos, float size = 1.f, RGBAColour colour = RGBAColour{ 255, 255, 255, 255 }, bool isCameraTransformations = true) const { DrawPoint(std::move(pos.x), std::move(pos.y), std::move(size), std::move(colour), isCameraTransformations); }
 
 	void DrawLine(float x1, float y1, float x2, float y2, RGBAColour colour = RGBAColour{ 255, 255, 255, 255 }, bool isCameraTransformations = true) const;
 	void DrawLine(Vector2 p1, Vector2 p2, RGBAColour colour = RGBAColour{ 255, 255, 255, 255 }, bool isCameraTransformations = true) const

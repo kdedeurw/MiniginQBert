@@ -42,10 +42,10 @@ bool KeyboardMouseListener::ProcessInput()
 			return true;
 			break;
 		case SDL_KEYDOWN:
-			HandleKeyEvent(e.key, true);
+			HandleKeyEvent(e.key, e.key.state);
 			break;
 		case SDL_KEYUP:
-			HandleKeyEvent(e.key, false);
+			HandleKeyEvent(e.key, e.key.state);
 			break;
 		case SDL_MOUSEMOTION:
 			HandleMouseMotionEvent(e.motion);

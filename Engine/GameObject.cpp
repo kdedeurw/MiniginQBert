@@ -62,6 +62,17 @@ void GameObject::Render() const
 	}
 }
 
+void GameObject::PostRender() const
+{
+	if (!m_IsRendered)
+		return;
+
+	for (Component* pComponent : m_pComponents)
+	{
+		pComponent->PostRender();
+	}
+}
+
 void GameObject::AddComponent(Component* pComponent)
 {
 	if (std::find(m_pComponents.begin(), m_pComponents.end(), pComponent) == m_pComponents.end())

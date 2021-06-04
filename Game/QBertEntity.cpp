@@ -14,9 +14,3 @@ QBertEntity::~QBertEntity()
 		delete m_pSubject;
 	m_pSubject = nullptr;
 }
-
-void QBertEntity::SetSubject(Subject* pSubject, bool isOverwrite)
-{
-	if (!m_pSubject || isOverwrite)
-		m_pSubject = pSubject;
-}

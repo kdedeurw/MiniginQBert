@@ -1,0 +1,108 @@
+{
+	"leveldifficulties":
+	[
+		{
+			"level":1
+			"steps":1
+			"can_go_back":false
+			"rounds":
+			[
+				{
+					"round":1
+					"enemies":"CRRRR"
+				},
+				{
+					"round":2
+					"enemies":"CRRRR"
+				},
+				{
+					"round":3
+					"enemies":"UWCUWCUWCUWG"
+				},
+				{
+					"round":4
+					"enemies":"RRRRCRRRG"
+				},
+			]
+		},
+		{
+			"level":2
+			"steps":2
+			"can_go_back":false
+			"rounds":
+			[
+				{
+					"round":1
+					"enemies":"UWCUWCUWCUWG"
+				},
+				{
+					"round":2
+					"enemies":"UWGSCUWCUWSCUWCS"
+				},
+				{
+					"round":3
+					"enemies":"RRRCRRRRGRRRCS"
+				},
+				{
+					"round":4
+					"enemies":"RSCUWURRWSRCSRCUWURGRUWRS"
+				},
+			]
+		},
+		{
+			"level":3
+			"steps":1
+			"can_go_back":true
+			"rounds":
+			[
+				{
+					"round":1
+					"enemies":"RRRCRRRGRCRRSRR"
+				},
+				{
+					"round":2
+					"enemies":"RSCWUWRCRUSRCUSWRCUWWRGRCWCURSCW"
+				},
+				{
+					"round":3
+					"enemies":"RSCWUWRCRUSRUSWRCUWWRGRCWU"
+				},
+				{
+					"round":4
+					"enemies":"RSCWUWRCRUSRCUSWRCUWWRGRCWCU"
+				},
+			]
+		},
+	],
+	"tiles":
+	[
+		{ "id":0, "pos":[], "connections":[] },
+		{ "id":1, "pos":[], "connections":[] },
+		{ "id":2, "pos":[], "connections":[] },
+		{ "id":3, "pos":[], "connections":[] },
+		{ "id":4, "pos":[], "connections":[] },
+		{ "id":5, "pos":[], "connections":[] },
+		{ "id":6, "pos":[], "connections":[] },
+		{ "id":7, "pos":[], "connections":[] },
+		{ "id":8, "pos":[], "connections":[] },
+		{ "id":9, "pos":[], "connections":[] },
+		{ "id":10, "pos":[], "connections":[] },
+		{ "id":11, "pos":[], "connections":[] },
+		{ "id":12, "pos":[], "connections":[] },
+		{ "id":13, "pos":[], "connections":[] },
+		{ "id":14, "pos":[], "connections":[] },
+		{ "id":15, "pos":[], "connections":[] },
+		{ "id":16, "pos":[], "connections":[] },
+		{ "id":17, "pos":[], "connections":[] },
+		{ "id":18, "pos":[], "connections":[] },
+		{ "id":19, "pos":[], "connections":[] },
+		{ "id":20, "pos":[], "connections":[] },
+		{ "id":21, "pos":[], "connections":[] },
+		{ "id":22, "pos":[], "connections":[] },
+		{ "id":23, "pos":[], "connections":[] },
+		{ "id":24, "pos":[], "connections":[] },
+		{ "id":25, "pos":[], "connections":[] },
+		{ "id":26, "pos":[], "connections":[] },
+		{ "id":27, "pos":[], "connections":[] }
+	]
+}

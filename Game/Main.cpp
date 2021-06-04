@@ -71,7 +71,6 @@ void QBertScene()
 	QBertLevel* pLevel = gm.CreateComponent<QBertLevel>();
 	pGo->AddComponent(pLevel);
 
-	//QBertGameObserver* pObserver = gm.CreateOnStack<QBertGameObserver>();
 	//Player 1
 	//GameObject* pPlayer = scene.CreateGameObject();
 	//pPlayer->GetTransform().Translate(100.f, 350.f);

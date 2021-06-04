@@ -2,7 +2,7 @@
 #include "QBertEntity.h"
 #include "Vectors.h"
 
-enum class State
+enum class TileState
 {
 	DefaultState,
 	IntermediateState,
@@ -20,21 +20,33 @@ public:
 	virtual void Render() const override;
 	virtual void Update() override;
 
-	State GetState() const { return m_State; }
-	void UpdateState(State state);
+	TileState GetState() const { return m_State; }
+	void UpdateState(TileState state);
+	QBertEntity* GetEntity() const { return m_pCurrentEntity; }
+	void UpdateEntity(QBertEntity* pEntity) { m_pCurrentEntity = pEntity; }
+
+	short GetTileId() const { return m_Id; }
+
+	struct Neighbours
+	{
+		QBertTile* pLeftTopNeighbour = nullptr;
+		QBertTile* pRightTopNeighbour = nullptr;
+		QBertTile* pRightBottomNeighbour = nullptr;
+		QBertTile* pLeftBottomNeighbour = nullptr;
+	};
+
+	const Neighbours& GetNeighbours() const { return m_Neighbours; }
 
 	static float GetTextureSize() { return m_TextureSize; }
 
 private:
-	State m_State;
+	short m_Id;
+	TileState m_State;
 	Texture2DComponent* m_pTexture;
+	QBertEntity* m_pCurrentEntity;
 	Vector2 m_InitOffset;
-
-	int level;
-	int x;
-	int y;
 	friend class QBertLevel;
-	QBertTile* m_pNeighbours[4];
+	Neighbours m_Neighbours;
 
 	const static float m_TextureSize;
 

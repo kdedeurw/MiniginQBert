@@ -11,7 +11,7 @@
 #include "Camera.h"
 #include "Math2D.h"
 
-void Renderer::Init(SDL_Window * window)
+void Renderer::Init(SDL_Window* window)
 {
 	m_pRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (!m_pRenderer) 
@@ -45,7 +45,26 @@ void Renderer::DrawPoint(float x, float y, RGBAColour colour, bool isCameraTrans
 		y += camPos.y;
 	}
 	SDL_RenderDrawPoint(m_pRenderer, std::move((int)x), std::move(GameState::GetInstance().pWindowInfo->Height - (int)y));
-	SDL_SetRenderDrawColor(m_pRenderer, 0, 0, 0, 1);
+	SDL_SetRenderDrawColor(m_pRenderer, 0, 0, 0, 0);
+}
+
+void Renderer::DrawPoint(float x, float y, float size, RGBAColour colour, bool isCameraTransformations) const
+{
+	SDL_SetRenderDrawColor(m_pRenderer, colour.r, colour.g, colour.b, colour.a);
+	if (isCameraTransformations)
+	{
+		Camera& cam = GameState::GetInstance().Camera;
+		const Vector2& camPos = cam.GetPosition();
+		x += camPos.x;
+		y += camPos.y;
+	}
+	const int height = GameState::GetInstance().pWindowInfo->Height;
+	SDL_Rect rect;
+	rect.x = (int)(x - size);
+	rect.y = height - (int)(y);
+	rect.w = rect.h = (int)(size * 2);
+	SDL_RenderFillRect(m_pRenderer, &rect);
+	SDL_SetRenderDrawColor(m_pRenderer, 0, 0, 0, 0);
 }
 
 void Renderer::DrawLine(float x1, float y1, float x2, float y2, RGBAColour colour, bool isCameraTransformations) const
@@ -61,7 +80,7 @@ void Renderer::DrawLine(float x1, float y1, float x2, float y2, RGBAColour colou
 		y2 += camPos.y;
 	}
 	SDL_RenderDrawLine(m_pRenderer, std::move((int)x1), std::move(GameState::GetInstance().pWindowInfo->Height - (int)y1), std::move((int)x2), std::move(GameState::GetInstance().pWindowInfo->Height - (int)y2));
-	SDL_SetRenderDrawColor(m_pRenderer, 0, 0, 0, 1);
+	SDL_SetRenderDrawColor(m_pRenderer, 0, 0, 0, 0);
 }
 
 void Renderer::RenderText(SDL_Texture* pTexture, float x, float y, float destX, float destY, float scaleX, float scaleY, float angle, const Vector2& pivot, RenderFlip flip) const

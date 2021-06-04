@@ -4,6 +4,7 @@
 #include "QBertLevelReader.h"
 #include "QBertTile.h"
 
+class QBertGameObserver;
 class QBertLevel final : public Component
 {
 public:
@@ -11,23 +12,30 @@ public:
 	~QBertLevel();
 
 	void Initialize() override;
-	void Render() const override;
+	void Render() const override {};
+	void PostRender() const override;
 	void Update() override;
 
-private:
-	short m_Round, m_Level;
-	const int m_MaxTiles = 28;
-	const int m_TileRow = 7;
-	std::vector<QBertTile*> m_pTiles;
-	QBertLevelReader m_LevelReader;
+	void JumpOnTile(int tileId);
+	QBertTile* GetTile(int tileId) const;
+	QBertTile* GetUpperTile() const { return m_pTiles[m_MaxTiles - 1]; };
 
-	State m_CurrentState = State::DefaultState;
-	float m_TestTimer = 1.f;
+private:
+	short m_Round, m_Level, m_TargetTiles;
+	const int m_MaxTiles = 28;
+	const int m_MaxTileRow = 7;
+	std::vector<QBertTile*> m_pTiles;
+	QBertGameObserver* m_pObserver;
+	QBertLevelReader m_LevelReader;
 
 	GameObject* CreateTile();
 	GameObject* CreatePlayer();
 
+	TileState EvaluateNextState(TileState state);
+
 	void ConnectTiles();
-	int GetLowerRow(int currRowSize) const;
-	int GetUpperRow(int currRowSize) const;
+	int GetLowerRowMin(int currRowSize) const;
+	int GetLowerRowMax(int currRowSize) const;
+	int GetUpperRowMin(int currRowSize) const;
+	int GetUpperRowMax(int currRowSize) const;
 };

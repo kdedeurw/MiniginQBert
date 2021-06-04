@@ -18,6 +18,7 @@ public:
 	virtual void Initialize();
 	virtual void Update();
 	virtual void Render() const;
+	virtual void PostRender() const;
 
 	bool operator==(const Scene& other) const;
 	bool operator==(Scene* pOther) const;

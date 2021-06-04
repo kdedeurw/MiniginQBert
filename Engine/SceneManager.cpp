@@ -51,6 +51,10 @@ void SceneManager::Render() const
 	}
 	if (m_pUIScene)
 		m_pUIScene->Render();
+	for (const Scene* pScene : m_pActiveScenes)
+	{
+		pScene->PostRender();
+	}
 }
 
 Scene& SceneManager::CreateUIScene()

@@ -21,8 +21,11 @@ public:
 	Component& operator=(Component&& other) = delete;
 
 	virtual void Initialize() = 0;
+	virtual void PostInitialize() {};
 	virtual void Render() const = 0;
+	virtual void PostRender() const {};
 	virtual void Update() = 0;
+	virtual void PostUpdate() {};
 
 	GameObject* GetGameObject() const { return m_pGameObject; };
 

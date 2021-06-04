@@ -4,6 +4,7 @@
 
 class Texture2DComponent;
 enum PlayerId : int;
+class QBertTile;
 class QBertPlayer final : public QBertEntity
 {
 public:
@@ -14,8 +15,7 @@ public:
 	void Render() const override;
 	void Update() override;
 
-	void OnDeath();
-	void OnRespawn();
+	void Respawn();
 
 	static float GetTextureSize() { return m_TextureSize; }
 
@@ -24,6 +24,10 @@ private:
 	float m_MoveDelay;
 	PlayerId m_PlayerId;
 	Texture2DComponent* m_pTexture;
+	QBertTile* m_pCurrentTile;
+
+	void HandleMove();
+	void OnDeath();
 
 	static const float m_TextureSize;
 };

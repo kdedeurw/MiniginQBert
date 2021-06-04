@@ -5,14 +5,6 @@
 #include "SingletonRef.h"
 #include <map>
 
-struct WASD
-{
-	bool w;
-	bool a;
-	bool s;
-	bool d;
-};
-
 enum class Key
 {
 	W,
@@ -94,6 +86,8 @@ private:
 	bool m_IsMouseMoved;
 	int m_ScrollWheel;
 	Vector2 m_MousePos;
+	//TODO: rework?, use bitmasking and store SDL_events
+	//OR add callback listeners (overkill?)
 	std::map<Key, bool> m_Keys;
 	std::map<Mouse, bool> m_MouseButtons;
 
@@ -114,4 +108,3 @@ private:
 	void InitializeKeys();
 	void InitializeMouseButtons();
 };
-

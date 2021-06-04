@@ -9,10 +9,10 @@ public:
 	QBertEntity();
 	virtual ~QBertEntity();
 
-	void SetSubject(Subject* pSubject, bool isOverwrite = false);
 	Subject* GetSubject() const { return m_pSubject; }
 
 protected:
 	Subject* m_pSubject;
+	friend class QBertLevel;
 	static QBertLevel* m_pLevel;
 };
