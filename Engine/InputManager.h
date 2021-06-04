@@ -1,6 +1,5 @@
 #pragma once
 #include <map>
-#include <windows.h>
 
 #pragma warning(disable : 26812)
 enum PlayerId

@@ -1,33 +1,38 @@
 #pragma once
 #include "Texture2DComponent.h"
 
+enum class SpriteLayout : bool
+{
+	Horizontal,
+	Vertical,
+};
+
 class SpriteComponent : public Texture2DComponent
 {
 public:
 	SpriteComponent();
 	virtual ~SpriteComponent();
 
-	virtual void Initialize() override;
-	//virtual void Render() const override;
+	virtual void Initialize();
 	virtual void Update() override;
 
 	void SetPlayOnce(bool enable);
 	void SetCurrentFrame(int frame);
-	void SetMaxFrames(int max);
-	//set width and height of 1 frame (in pixels) -> srcRect.xy
-	void SetSizes(const Vector2& sizes);
+	void SetMaxFrames(int maxX, int maxY = 1);
+	//set INITIAL offset (in pixels) in x and y directions
+	void SetInitTexOffset(const Vector2& offset) { m_InitOffset = offset; }
+	//get INITIAL offset (in pixels) in x and y directions
+	Vector2 GetInitTexOffset() const { return m_InitOffset; }
 	//set time per frame
 	void SetTickRate(float tickRate);
-	//set offset in pixels in x and y directions
-	void SetOffset(const Vector2& offset);
+	void SetSpriteLayout(SpriteLayout layout);
 	//set current frame and current tick to 0
 	void Reset();
 
 protected:
 	bool m_PlayOnce;
-	int m_Frame;
-	int m_MaxFrames;
-	float m_Tick;
-	float m_TickRate;
-	Vector2 m_Offset;
+	SpriteLayout m_Layout;
+	int m_CurrentFrame, m_MaxXFrames, m_MaxYFrames;
+	float m_Tick, m_TickRate;
+	Vector2 m_InitOffset;
 };

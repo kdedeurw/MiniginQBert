@@ -1,6 +1,6 @@
+#include "pch.h"
 #include "SoundSystem.h"
 #include <SDL_mixer.h>
-#include <iostream>
 
 SoundSystem::SoundSystem()
 	: m_IsContinue{ true }

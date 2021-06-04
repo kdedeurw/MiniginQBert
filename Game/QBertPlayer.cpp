@@ -1,28 +1,22 @@
 #include "pch.h"
 #include "QBertPlayer.h"
 #include "KeyboardMouseListener.h"
-#include "GameObject.h"
 #include "Subject.h"
 #include "QBertEvents.h"
-#include "Components.h"
-#include "GameState.h"
 #include "QBertTile.h"
 #include "QBertLevel.h"
 
 const float QBertPlayer::m_TextureSize = 16.f;
 
-enum class MovementState
-{
-	Ground,
-	Jump,
-};
-
 QBertPlayer::QBertPlayer()
 	: m_IsKilled{}
+	, m_IsOnTile{ true }
 	, m_PlayerId{ PlayerId::Player1 }
 	, m_pTexture{}
-	, m_MoveDelay{}
+	, m_CurrentMoveDelay{}
 	, m_pCurrentTile{}
+	, m_DesiredPos{}
+	, m_FormerPos{}
 {
 	if (!m_pSubject)
 		m_pSubject = new Subject{};
@@ -41,6 +35,10 @@ void QBertPlayer::Initialize()
 	m_pTexture->SetTextureSize({ m_TextureSize, m_TextureSize });
 	m_pTexture->SetTextureOffset({m_TextureSize * 6, 0.f});
 
+	TransformComponent& trans = m_pGameObject->GetTransform();
+	Vector4& dstRct = m_pTexture->GetTexture2D()->GetDestRect();
+	dstRct.y += m_TextureSize * trans.GetWorld().Scale.y;
+
 	m_pCurrentTile = m_pLevel->GetUpperTile();
 }
 
@@ -51,11 +49,19 @@ void QBertPlayer::Render() const
 void QBertPlayer::Update()
 {
 	HandleMove();
+
+	//TODO: grid movement
+	//1: start on tile
+	//2: find new tile to move on
+	//3: move for 0.5f, THEN jump on tile
+	//4: lock movement to tile pos
+	//5: LERP between desired and current pos OR add gravity factor
 }
 
 void QBertPlayer::Respawn()
 {
 	m_pCurrentTile = m_pLevel->GetUpperTile();
+	m_DesiredPos = m_pCurrentTile->GetGameObject()->GetTransform().GetWorld().Position;
 
 	TransformComponent& trans = m_pGameObject->GetTransform();
 	trans.SetPosition(m_pCurrentTile->GetGameObject()->GetTransform().GetWorld().Position);
@@ -63,79 +69,88 @@ void QBertPlayer::Respawn()
 
 void QBertPlayer::HandleMove()
 {
-	m_MoveDelay -= GameState::GetInstance().DeltaTime;
+	GameState& gs = GameState::GetInstance();
+	TransformComponent& trans = m_pGameObject->GetTransform();
 
-	if (m_MoveDelay > 0.f)
+	if (IsMoving())
+	{
+		const float remappedMoveDelay = m_CurrentMoveDelay / m_MoveDelay;
+		trans.SetPosition(Math2D::LERP(m_FormerPos, m_DesiredPos, 1.f - remappedMoveDelay));
+
+		m_CurrentMoveDelay -= gs.DeltaTime;
 		return;
+	}
+
+	LandOnTile(m_pCurrentTile);
 
 	const KeyboardMouseListener& kbml = KeyboardMouseListener::GetInstance();
-	TransformComponent& trans = m_pGameObject->GetTransform();
-	const float tileSize = QBertTile::GetTextureSize();
-	const Vector2& scale = trans.GetWorld().Scale;
-
 	const QBertTile::Neighbours& neighbours = m_pCurrentTile->GetNeighbours();
 
+	bool isInput{};
+	QBertTile* pNextTile{};
+
+	//TODO: make commands
 	if (kbml.IsPressed(Key::A))
 	{
-		trans.Translate((-tileSize / 2) * scale.x, (-tileSize / 2 - m_TextureSize / 2) * scale.y);
-		m_pTexture->SetTextureOffset({ m_TextureSize * 7, 0.f });
+		m_pTexture->SetTextureOffset({ m_TextureSize * 6, 0.f });
 
-		if (neighbours.pLeftBottomNeighbour)
-		{
-			m_MoveDelay = 0.5f;
-			m_pCurrentTile = neighbours.pLeftBottomNeighbour;
-			m_pLevel->JumpOnTile(m_pCurrentTile->GetTileId());
-		}
-		else
-			OnDeath();
+		pNextTile = neighbours.pLeftBottomNeighbour;
+		isInput = true;
 	}
 	else if (kbml.IsPressed(Key::D))
 	{
-		trans.Translate((tileSize / 2) * scale.x, (tileSize / 2 + m_TextureSize / 2) * scale.y);
-		m_pTexture->SetTextureOffset({ m_TextureSize * 1, 0.f });
+		m_pTexture->SetTextureOffset({ 0.f, 0.f });
 
-		if (neighbours.pRightTopNeighbour)
-		{
-			m_MoveDelay = 0.5f;
-			m_pCurrentTile = neighbours.pRightTopNeighbour;
-			m_pLevel->JumpOnTile(m_pCurrentTile->GetTileId());
-		}
-		else
-			OnDeath();
+		pNextTile = neighbours.pRightTopNeighbour;
+		isInput = true;
 	}
-	if (kbml.IsPressed(Key::W))
+	else if (kbml.IsPressed(Key::W))
 	{
-		trans.Translate((-tileSize / 2) * scale.x, (tileSize / 2 + m_TextureSize / 2) * scale.y);
-		m_pTexture->SetTextureOffset({ m_TextureSize * 3, 0.f });
+		m_pTexture->SetTextureOffset({ m_TextureSize * 2, 0.f });
 
-		if (neighbours.pLeftTopNeighbour)
-		{
-			m_MoveDelay = 0.5f;
-			m_pCurrentTile = neighbours.pLeftTopNeighbour;
-			m_pLevel->JumpOnTile(m_pCurrentTile->GetTileId());
-		}
-		else
-			OnDeath();
+		pNextTile = neighbours.pLeftTopNeighbour;
+		isInput = true;
 
 	}
 	else if (kbml.IsPressed(Key::S))
 	{
-		trans.Translate((tileSize / 2) * scale.x, (-tileSize / 2 - m_TextureSize / 2) * scale.y);
-		m_pTexture->SetTextureOffset({ m_TextureSize * 5, 0.f });
+		m_pTexture->SetTextureOffset({ m_TextureSize * 4, 0.f });
 
-		if (neighbours.pRightBottomNeighbour)
-		{
-			m_MoveDelay = 0.5f;
-			m_pCurrentTile = neighbours.pRightBottomNeighbour;
-			m_pLevel->JumpOnTile(m_pCurrentTile->GetTileId());
-		}
-		else
-			OnDeath();
+		pNextTile = neighbours.pRightBottomNeighbour;
+		isInput = true;
 	}
+
+	if (!isInput)
+		return;
+
+	if (pNextTile)
+	{
+		m_CurrentMoveDelay = m_MoveDelay;
+		m_pCurrentTile = pNextTile;
+		m_FormerPos = trans.GetWorld().Position;
+		m_DesiredPos = pNextTile->GetGameObject()->GetTransform().GetWorld().Position;
+		m_IsOnTile = false;
+
+
+		Vector2 texOffset = m_pTexture->GetTextureOffset();
+		texOffset.x += m_TextureSize;
+		m_pTexture->SetTextureOffset(texOffset);
+	}
+	else
+		OnDeath();
 }
 
 void QBertPlayer::OnDeath()
 {
 	m_pSubject->Notify(m_pGameObject, m_PlayerId);
-	//TODO: respawn player
+	//TODO: respawn player (observer handles for now)
+}
+
+void QBertPlayer::LandOnTile(QBertTile* pTile)
+{
+	if (m_IsOnTile)
+		return;
+
+	m_pLevel->JumpOnTile(pTile->GetTileId());
+	m_IsOnTile = true;
 }

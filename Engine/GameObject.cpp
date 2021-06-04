@@ -98,6 +98,7 @@ void GameObject::AddChildObject(GameObject* pChild)
 	{
 		m_pChildren.push_back(pChild);
 		pChild->m_pParent = this;
+		pChild->GetTransform().Initialize();
 	}
 }
 
@@ -108,5 +109,6 @@ void GameObject::RemoveChildObject(GameObject* pChild)
 	{
 		m_pChildren.erase(it);
 		pChild->m_pParent = nullptr;
+		pChild->GetTransform().Initialize();
 	}
 }

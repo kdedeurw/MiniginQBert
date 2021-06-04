@@ -1,6 +1,5 @@
+#include "pch.h"
 #include "TransformComponent.h"
-#include "GameObject.h"
-#include "Math2D.h"
 
 TransformComponent::TransformComponent()
 	: m_TransformChanges{ TransformChange::None }
@@ -11,6 +10,8 @@ TransformComponent::TransformComponent()
 
 void TransformComponent::Initialize()
 {
+	m_TransformChanges = 7; //all bitmasks
+	Update();
 }
 
 void TransformComponent::Render() const
@@ -39,34 +40,32 @@ void TransformComponent::Update()
 	m_TransformChanges = TransformChange::None;
 }
 
-Transform& TransformComponent::GetLocal()
-{
-	return m_Local;
-}
-
-Transform& TransformComponent::GetWorld()
-{
-	Update(); //recalculate world transform if changed
-	return m_World;
-}
-
 void TransformComponent::Translate(float x, float y)
 {
 	m_Local.Position.x += x;
 	m_Local.Position.y += y;
 	m_TransformChanges |= TransformChange::Translation;
+
+	for (GameObject* pChild : m_pGameObject->GetChildren())
+		pChild->GetTransform().m_TransformChanges |= TransformChange::Translation;
 }
 
 void TransformComponent::Translate(const Vector2& vec2)
 {
 	m_Local.Position += vec2;
 	m_TransformChanges |= TransformChange::Translation;
+
+	for (GameObject* pChild : m_pGameObject->GetChildren())
+		pChild->GetTransform().m_TransformChanges |= TransformChange::Translation;
 }
 
 void TransformComponent::Translate(const Vector3& vec3)
 {
 	m_Local.Position += vec3;
 	m_TransformChanges |= TransformChange::Translation;
+
+	for (GameObject* pChild : m_pGameObject->GetChildren())
+		pChild->GetTransform().m_TransformChanges |= TransformChange::Translation;
 }
 
 void TransformComponent::SetPosition(float x, float y, float z)
@@ -75,6 +74,9 @@ void TransformComponent::SetPosition(float x, float y, float z)
 	m_Local.Position.y = y;
 	m_Local.Position.z = z;
 	m_TransformChanges |= TransformChange::Translation;
+
+	for (GameObject* pChild : m_pGameObject->GetChildren())
+		pChild->GetTransform().m_TransformChanges |= TransformChange::Translation;
 }
 
 void TransformComponent::SetPosition(const Vector2& vec2, float z)
@@ -83,24 +85,36 @@ void TransformComponent::SetPosition(const Vector2& vec2, float z)
 	m_Local.Position.y = vec2.y;
 	m_Local.Position.z = z;
 	m_TransformChanges |= TransformChange::Translation;
+
+	for (GameObject* pChild : m_pGameObject->GetChildren())
+		pChild->GetTransform().m_TransformChanges |= TransformChange::Translation;
 }
 
 void TransformComponent::SetPosition(const Vector3& vec3)
 {
 	m_Local.Position = vec3;
 	m_TransformChanges |= TransformChange::Translation;
+
+	for (GameObject* pChild : m_pGameObject->GetChildren())
+		pChild->GetTransform().m_TransformChanges |= TransformChange::Translation;
 }
 
 void TransformComponent::Rotate(float r)
 {
 	m_Local.Rotation += r;
 	m_TransformChanges |= TransformChange::Rotation;
+
+	for (GameObject* pChild : m_pGameObject->GetChildren())
+		pChild->GetTransform().m_TransformChanges |= TransformChange::Rotation;
 }
 
 void TransformComponent::SetRotation(float r)
 {
 	m_Local.Rotation = r;
 	m_TransformChanges |= TransformChange::Rotation;
+
+	for (GameObject* pChild : m_pGameObject->GetChildren())
+		pChild->GetTransform().m_TransformChanges |= TransformChange::Rotation;
 }
 
 void TransformComponent::SetScale(float x, float y)
@@ -108,12 +122,18 @@ void TransformComponent::SetScale(float x, float y)
 	m_Local.Scale.x = x; 
 	m_Local.Scale.y = y;
 	m_TransformChanges |= TransformChange::Scale;
+
+	for (GameObject* pChild : m_pGameObject->GetChildren())
+		pChild->GetTransform().m_TransformChanges |= TransformChange::Scale;
 }
 
 void TransformComponent::SetScale(const Vector2& scale)
 {
 	m_Local.Scale = scale;
 	m_TransformChanges |= TransformChange::Scale;
+
+	for (GameObject* pChild : m_pGameObject->GetChildren())
+		pChild->GetTransform().m_TransformChanges |= TransformChange::Scale;
 }
 
 void TransformComponent::CalculateWorldPosition()

@@ -1,21 +1,16 @@
 #include "pch.h"
 #include "QBertLevel.h"
-#include "GlobalMemoryPools.h"
-#include "Components.h"
-#include "GameState.h"
 #include "QBertTile.h"
 #include "QBertPlayer.h"
-#include "Math2D.h"
-#include "Renderer.h"
 #include "QBertGameObserver.h"
 
 QBertLevel::QBertLevel()
 	: m_Round{}
 	, m_Level{}
 	, m_TargetTiles{}
-	, m_LevelReader{ "Resources/QBertLevels.txt" }
-	, m_pTiles{}
 	, m_pObserver{}
+	, m_LevelReader{}
+	, m_pTiles{}
 {
 	m_pTiles.reserve(28);
 }
@@ -29,12 +24,12 @@ void QBertLevel::Initialize()
 	//TODO: fix
 	QBertEntity::m_pLevel = this;
 
-	//TODO: read level from file
-	//const QBertLevelData& level = m_LevelReader.ReadNextLevel();
+	const std::vector<QBertLevelData>& levels = m_LevelReader.ReadLevelDatas("../Resources/QBertLevels.json");
+	levels;
 
 	m_pObserver = GlobalMemoryPools::GetInstance().CreateOnStack<QBertGameObserver>();
 
-	const Vector2 scale{ 2.f, 2.f };
+	const Vector2& scale = m_pGameObject->GetTransform().GetWorld().Scale;
 	int delimiter = m_MaxTileRow;
 	const float tileSize = QBertTile::GetTextureSize();
 	float totalX{ tileSize };
@@ -46,9 +41,9 @@ void QBertLevel::Initialize()
 		{
 			GameObject* pTile = CreateTile();
 			pTile->GetTransform().SetPosition((tileSize * i + totalX) * scale.x, (tileSize + tileSize * j + totalY) * scale.y);
-			pTile->GetTransform().SetScale(scale);
 
 			GetGameObject()->AddChildObject(pTile);
+			pTile->Initialize();
 		}
 		totalY -= tileSize / 4;
 		totalX += tileSize / 2;
@@ -59,9 +54,9 @@ void QBertLevel::Initialize()
 
 	const float playerSize = QBertPlayer::GetTextureSize();
 	GameObject* pPlayer = CreatePlayer();
-	pPlayer->GetTransform().SetPosition((tileSize * 3 + tileSize / 2) * scale.x + playerSize / scale.x, (tileSize * 6) * scale.y + (playerSize / 2) * scale.y);
-	pPlayer->GetTransform().SetScale(scale);
+	pPlayer->GetTransform().SetPosition(GetUpperTile()->GetGameObject()->GetTransform().GetWorld().Position);
 	GetGameObject()->AddChildObject(pPlayer);
+	pPlayer->Initialize();
 }
 
 void QBertLevel::PostRender() const
@@ -90,6 +85,10 @@ void QBertLevel::PostRender() const
 			Renderer::GetInstance().DrawLine(pTile->m_pGameObject->GetTransform().GetWorld().Position,
 				neighBours.pLeftBottomNeighbour->m_pGameObject->GetTransform().GetWorld().Position, RGBAColour{ 255, 0, 0, 128 });
 		}
+
+		Font* pFont = ResourceManager::GetInstance().LoadFont("Lingua.otf", 24);
+		const Vector2& pos = pTile->GetGameObject()->GetTransform().GetWorld().Position;
+		Renderer::GetInstance().RenderTextImmediate(std::to_string(pTile->GetTileId()), pFont, pos.x, pos.y, 1.f, 1.f, RGBAColour{ 255, 255, 255, 128 });
 
 		Renderer::GetInstance().DrawPoint(pTile->m_pGameObject->GetTransform().GetWorld().Position, scale.x, RGBAColour{ 0, 255, 0, 128 });
 	}
@@ -149,8 +148,6 @@ GameObject* QBertLevel::CreateTile()
 
 	pTile->m_Id = static_cast<short>(m_pTiles.size());
 
-	pGo->Initialize();
-
 	m_pTiles.push_back(pTile);
 
 	return pGo;
@@ -169,9 +166,17 @@ GameObject* QBertLevel::CreatePlayer()
 	
 	pPlayer->GetSubject()->AddObserver(m_pObserver);
 
-	pGo->Initialize();
-
 	return pGo;
+}
+
+GameObject* QBertLevel::CreateEnemy()
+{
+	return nullptr;
+}
+
+GameObject* QBertLevel::CreateSpinningDisk()
+{
+	return nullptr;
 }
 
 void QBertLevel::ConnectTiles()

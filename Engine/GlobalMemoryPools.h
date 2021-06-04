@@ -16,7 +16,6 @@
 //this memory is being cleaned up afterwards
 
 struct SDL_Texture;
-class Scene;
 class GlobalMemoryPools final : public SingletonRef<GlobalMemoryPools>
 {
 public:

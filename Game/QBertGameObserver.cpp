@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "QBertGameObserver.h"
 #include "QBertEvents.h"
-#include <iostream>
-#include "GameObject.h"
 #include "QBertPlayer.h"
 
 QBertGameObserver::QBertGameObserver()
@@ -54,4 +52,11 @@ void QBertGameObserver::OnNotify(GameObject* pGameObject, int event)
 	default:
 		break;
 	}
+}
+
+const PlayerStats& QBertGameObserver::GetStats(PlayerId id)
+{
+	if (id == PlayerId::Player1)
+		return m_Player1Stats;
+	return m_Player2Stats;
 }

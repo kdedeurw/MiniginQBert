@@ -2,18 +2,14 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 
-#include "TextComponent.h"
-#include "Renderer.h"
 #include "Font.h"
 #include "Texture2D.h"
-#include "GlobalMemoryPools.h"
-#include "Vectors.h"
 
 TextComponent::TextComponent()
 	: Component{}
 	, m_NeedsUpdate{ true }
 	, m_Text{ "Sample Text" }
-	, m_pFont{ nullptr } //TODO: assign basic font
+	, m_pFont{ ResourceManager::GetInstance().LoadFont("Lingua.otf", 24) }
 	, m_pTextureData{ GlobalMemoryPools::GetInstance().CreateTexture2D(nullptr) } //get memory address, this will be overwritten at will
 	, m_Colour{}
 {}

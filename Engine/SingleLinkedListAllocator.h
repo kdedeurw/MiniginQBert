@@ -3,23 +3,22 @@
 
 using namespace CustomMemoryAllocator;
 
-struct Header
-{
-	size_t count = 0;
-};
-
-struct Block : Header
-{
-	const static int size = 16;
-	union
-	{
-		Block* next = nullptr;
-		char data[size - sizeof(Header)];
-	};
-};
-
 class SingleLinkedListAllocator final : public MemoryAllocator
 {
+	struct Header
+	{
+		size_t count = 0;
+	};
+
+	struct Block : Header
+	{
+		const static int size = 16;
+		union
+		{
+			Block* next = nullptr;
+			char data[size - sizeof(Header)];
+		};
+	};
 public:
 	SingleLinkedListAllocator();
 	~SingleLinkedListAllocator();

@@ -4,8 +4,6 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 
-#include "Renderer.h"
-#include "GlobalMemoryPools.h"
 #include "Texture2D.h"
 #include "Font.h"
 

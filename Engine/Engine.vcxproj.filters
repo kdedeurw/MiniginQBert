@@ -16,9 +16,6 @@
     <ClCompile Include="Font.cpp">
       <Filter>Core Files\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>Base Files\General</Filter>
-    </ClCompile>
     <ClCompile Include="InputManager.cpp">
       <Filter>Base Files\Input\Managers</Filter>
     </ClCompile>
@@ -27,12 +24,6 @@
     </ClCompile>
     <ClCompile Include="GlobalMemoryPools.cpp">
       <Filter>Core Files\Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene.cpp">
-      <Filter>Base Files\General</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneManager.cpp">
-      <Filter>Base Files\General</Filter>
     </ClCompile>
     <ClCompile Include="Renderer.cpp">
       <Filter>Core Files\Rendering</Filter>
@@ -94,6 +85,19 @@
     <ClCompile Include="DebugSoundSystem.cpp">
       <Filter>Base Files\Audio</Filter>
     </ClCompile>
+    <ClCompile Include="TransformComponent.cpp">
+      <Filter>Base Files\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Base Files\General\SceneGraph</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Base Files\General\SceneGraph</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>Base Files\General\SceneGraph</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h" />
@@ -139,9 +143,6 @@
     <ClInclude Include="BinaryReader.h">
       <Filter>Core Files\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="GameObject.h">
-      <Filter>Base Files\General</Filter>
-    </ClInclude>
     <ClInclude Include="InputManager.h">
       <Filter>Base Files\Input\Managers</Filter>
     </ClInclude>
@@ -153,12 +154,6 @@
     </ClInclude>
     <ClInclude Include="MemoryOverrides.h">
       <Filter>Core Files\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene.h">
-      <Filter>Base Files\General</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneManager.h">
-      <Filter>Base Files\General</Filter>
     </ClInclude>
     <ClInclude Include="RenderFlip.h">
       <Filter>Core Files\Rendering</Filter>
@@ -247,6 +242,19 @@
     <ClInclude Include="DebugSoundSystem.h">
       <Filter>Base Files\Audio</Filter>
     </ClInclude>
+    <ClInclude Include="TransformComponent.h">
+      <Filter>Base Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Base Files\General\SceneGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Base Files\General\SceneGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.h">
+      <Filter>Base Files\General\SceneGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core Files">
@@ -296,6 +304,9 @@
     </Filter>
     <Filter Include="Base Files\Miscellaneous">
       <UniqueIdentifier>{2c651a4c-0f0f-4bab-8122-1818a6766bfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base Files\General\SceneGraph">
+      <UniqueIdentifier>{a315edb9-7a14-470e-a2ac-b5c73f6ef7ec}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

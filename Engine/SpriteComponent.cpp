@@ -1,43 +1,65 @@
 #include "pch.h"
 #include "SpriteComponent.h"
-#include "GameState.h"
 
 SpriteComponent::SpriteComponent()
 	: m_PlayOnce{}
-	, m_Frame{}
-	, m_MaxFrames{ 1 }
+	, m_Layout{ SpriteLayout::Horizontal }
+	, m_CurrentFrame{}
+	, m_MaxXFrames{ 1 }
+	, m_MaxYFrames{ 1 }
 	, m_Tick{}
 	, m_TickRate{ 0.25f }
-	, m_Offset{}
 {}
 
 SpriteComponent::~SpriteComponent()
 {}
 
 void SpriteComponent::Initialize()
-{}
-
-//void SpriteComponent::Render() const
-//{
-//}
+{
+	//Set init frame coords
+	Vector4& srcRect = m_pTexture->GetSourceRect();
+	if (m_Layout == SpriteLayout::Horizontal)
+	{
+		srcRect.x = srcRect.z * (m_CurrentFrame % m_MaxXFrames) + m_InitOffset.x;
+		srcRect.y = srcRect.w * (m_CurrentFrame / m_MaxYFrames) + m_InitOffset.y;
+	}
+	else
+	{
+		srcRect.x = srcRect.z * (m_CurrentFrame / m_MaxXFrames) + m_InitOffset.x;
+		srcRect.y = srcRect.w * (m_CurrentFrame % m_MaxYFrames) + m_InitOffset.y;
+	}
+}
 
 void SpriteComponent::Update()
 {
-	m_Tick += GameState::GetInstance().DeltaTime;
+	const int maxFrames = m_MaxXFrames * m_MaxYFrames;
 	if (m_PlayOnce)
 	{
-		if (m_Frame >= m_MaxFrames)
+		if (m_CurrentFrame >= maxFrames)
 			return;
 	}
+
+	m_Tick += GameState::GetInstance().DeltaTime;
 	if (m_Tick >= m_TickRate)
 	{
-		++m_Frame;
-		if (m_Frame >= m_MaxFrames)
-			m_Frame = 0;
+		++m_CurrentFrame;
+		if (m_CurrentFrame >= maxFrames)
+			m_CurrentFrame = 0;
 		m_Tick = 0;
 		
 		Vector4& srcRect = m_pTexture->GetSourceRect();
-		srcRect.x = srcRect.z * m_Frame + m_Offset.x;
+		if (m_Layout == SpriteLayout::Horizontal)
+		{
+			srcRect.x = srcRect.z * (m_CurrentFrame % m_MaxXFrames) + m_InitOffset.x;
+			if (m_MaxYFrames > 1)
+				srcRect.y = srcRect.w * (m_CurrentFrame / m_MaxYFrames) + m_InitOffset.y;
+		}
+		else
+		{
+			if (m_MaxXFrames > 1)
+				srcRect.x = srcRect.z * (m_CurrentFrame / m_MaxXFrames) + m_InitOffset.x;
+			srcRect.y = srcRect.w * (m_CurrentFrame % m_MaxYFrames) + m_InitOffset.y;
+		}
 	}
 }
 
@@ -48,21 +70,15 @@ void SpriteComponent::SetPlayOnce(bool enable)
 
 void SpriteComponent::SetCurrentFrame(int frame)
 {
-	m_Frame = frame;
+	m_CurrentFrame = frame;
 }
 
-void SpriteComponent::SetMaxFrames(int max)
+void SpriteComponent::SetMaxFrames(int maxX, int maxY)
 {
-	m_MaxFrames = max;
-}
-
-void SpriteComponent::SetSizes(const Vector2& sizes)
-{
-	m_pTexture->GetSourceRect().z = sizes.x;
-	m_pTexture->GetDestRect().z = sizes.x;
-
-	m_pTexture->GetSourceRect().w = sizes.y;
-	m_pTexture->GetDestRect().w = sizes.y;
+	if (maxX > 0)
+		m_MaxXFrames = maxX;
+	if (maxY > 0)
+		m_MaxYFrames = maxY;
 }
 
 void SpriteComponent::SetTickRate(float tickRate)
@@ -70,13 +86,13 @@ void SpriteComponent::SetTickRate(float tickRate)
 	m_TickRate = tickRate;
 }
 
-void SpriteComponent::SetOffset(const Vector2& offset)
+void SpriteComponent::SetSpriteLayout(SpriteLayout layout)
 {
-	m_Offset = offset;
+	m_Layout = layout;
 }
 
 void SpriteComponent::Reset()
 {
-	m_Frame = 0;
+	m_CurrentFrame = 0;
 	m_Tick = 0;
 }

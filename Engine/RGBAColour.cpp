@@ -1,7 +1,5 @@
 #include "pch.h"
 #include "RGBAColour.h"
-#include "Vectors.h"
-#include "Math2D.h"
 
 RGBAColour::RGBAColour(int r, int g, int b, int a)
 	: r{ (uint8)Math2D::Clamp(r, 0, Math2D::MaxColourRange) }

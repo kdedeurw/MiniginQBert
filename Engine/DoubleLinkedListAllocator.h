@@ -4,33 +4,32 @@
 
 using namespace CustomMemoryAllocator;
 
-enum class Status : unsigned
-{
-	free,
-	reserved,
-};
-struct Header
-{
-	Status status : 1;
-	unsigned int count : std::numeric_limits<unsigned int>::digits - 1;
-};
-struct Block : Header
-{
-	enum { size = 16 };
-	struct Links
-	{
-		Block* next;
-		Block* prev;
-	};
-	union
-	{
-		Links link;
-		char data[size - sizeof(Header)];
-	};
-};
-
 class DoubleLinkedListAllocator final : public MemoryAllocator
 {
+	enum class Status : unsigned
+	{
+		free,
+		reserved,
+	};
+	struct Header
+	{
+		Status status : 1;
+		unsigned int count : std::numeric_limits<unsigned int>::digits - 1;
+	};
+	struct Block : Header
+	{
+		enum { size = 16 };
+		struct Links
+		{
+			Block* next;
+			Block* prev;
+		};
+		union
+		{
+			Links link;
+			char data[size - sizeof(Header)];
+		};
+	};
 public:
 	DoubleLinkedListAllocator();
 	~DoubleLinkedListAllocator();

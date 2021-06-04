@@ -1,15 +1,10 @@
 #include "pch.h"
 #include "Renderer.h"
 #include <SDL.h>
-#include "SceneManager.h"
-#include "Texture2D.h"
 #include <SDL_ttf.h>
-#include "ResourceManager.h"
+#include "Texture2D.h"
 #include "Font.h"
-#include "GameState.h"
-#include "WindowInfo.h"
 #include "Camera.h"
-#include "Math2D.h"
 
 void Renderer::Init(SDL_Window* window)
 {
@@ -61,7 +56,7 @@ void Renderer::DrawPoint(float x, float y, float size, RGBAColour colour, bool i
 	const int height = GameState::GetInstance().pWindowInfo->Height;
 	SDL_Rect rect;
 	rect.x = (int)(x - size);
-	rect.y = height - (int)(y);
+	rect.y = height - (int)(y + size);
 	rect.w = rect.h = (int)(size * 2);
 	SDL_RenderFillRect(m_pRenderer, &rect);
 	SDL_SetRenderDrawColor(m_pRenderer, 0, 0, 0, 0);
@@ -81,6 +76,19 @@ void Renderer::DrawLine(float x1, float y1, float x2, float y2, RGBAColour colou
 	}
 	SDL_RenderDrawLine(m_pRenderer, std::move((int)x1), std::move(GameState::GetInstance().pWindowInfo->Height - (int)y1), std::move((int)x2), std::move(GameState::GetInstance().pWindowInfo->Height - (int)y2));
 	SDL_SetRenderDrawColor(m_pRenderer, 0, 0, 0, 0);
+}
+
+void Renderer::RenderTextImmediate(const std::string& text, Font* pFont, float x, float y, float scaleX, float scaleY, RGBAColour colour)
+{
+	SDL_Surface* pSurface = TTF_RenderText_Blended(pFont->GetFont(), text.c_str(), reinterpret_cast<SDL_Color&>(colour));
+	if (!pSurface)
+		throw std::runtime_error(std::string("Render text failed: ") + SDL_GetError());
+	SDL_Texture* pTexture = SDL_CreateTextureFromSurface(Renderer::GetInstance().GetSDLRenderer(), pSurface);
+	if (!pTexture)
+		throw std::runtime_error(std::string("Create text texture from surface failed: ") + SDL_GetError());
+	SDL_FreeSurface(pSurface);
+	RenderText(pTexture, x, y, 0.f, 0.f, scaleX, scaleY);
+	SDL_DestroyTexture(pTexture);
 }
 
 void Renderer::RenderText(SDL_Texture* pTexture, float x, float y, float destX, float destY, float scaleX, float scaleY, float angle, const Vector2& pivot, RenderFlip flip) const
@@ -201,8 +209,8 @@ void Renderer::CalculateTransformations(float& x, float& y, float& width, float&
 	width *= scaleX;
 	height *= scaleY;
 
-	x = (x + destX) - (width / 2 * scaleX);
-	y = (y + destY) + (height / 2 * scaleY); //sign flipped, because bottom left == 0,0
+	x = (x + destX) - (width / 2);
+	y = (y + destY) + (height / 2); //sign flipped, because bottom left == 0,0
 }
 
 void Renderer::AddCameraTransformations(Camera& camera, float& x, float& y, float& angle) const

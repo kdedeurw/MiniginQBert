@@ -3,7 +3,6 @@
 #include <thread>
 
 struct SDL_Window;
-enum class Key;
 namespace Engine2D
 {
 	class Core final

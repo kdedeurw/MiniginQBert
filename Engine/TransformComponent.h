@@ -25,8 +25,8 @@ public:
 	void Render() const override;
 	void Update() override;
 
-	Transform& GetLocal();
-	Transform& GetWorld();
+	const Transform& GetLocal() const { return m_Local; }
+	const Transform& GetWorld() { Update(); return m_World; } //TODO: possible inaccuracies
 
 	void Translate(float x, float y);
 	void Translate(const Vector2& vec2);

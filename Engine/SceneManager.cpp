@@ -1,8 +1,5 @@
 #include "pch.h"
 #include "SceneManager.h"
-#include "Scene.h"
-#include "GameState.h"
-#include "MemoryAllocator.h"
 
 SceneManager::SceneManager()
 	: m_pAllScenes{}

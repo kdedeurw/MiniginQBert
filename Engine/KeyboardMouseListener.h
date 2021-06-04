@@ -1,7 +1,5 @@
 #pragma once
 #include "InputManager.h"
-#include <SDL.h>
-#include "Vectors.h"
 #include "SingletonRef.h"
 #include <map>
 
@@ -52,7 +50,10 @@ enum class ScrollWheel
 	Down,
 };
 
-//multiple inheritance time!
+struct SDL_KeyboardEvent;
+struct SDL_MouseMotionEvent;
+struct SDL_MouseButtonEvent;
+struct SDL_MouseWheelEvent;
 class KeyboardMouseListener final : public InputManager, public SingletonRef<KeyboardMouseListener>
 {
 public:

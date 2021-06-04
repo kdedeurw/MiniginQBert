@@ -1,26 +1,42 @@
 #pragma once
-#include <fstream>
 #include <string>
+
+struct QBertRound
+{
+	BYTE RoundId;
+	std::string Enemies;
+};
 
 struct QBertLevelData
 {
-	short LevelId = -1;
-	short TileCount = -1;
-	bool* pTiles;
-	short Rule;
-	const char* Enemies;
+	static const int MaxRounds = 4;
+
+	bool CanGoBack;
+	BYTE Id;
+	BYTE Steps;
+	QBertRound Rounds[MaxRounds];
+};
+
+struct QBertLevelLayout
+{
+	struct QBertTileData
+	{
+		BYTE TileId;
+		Vector2 Pos;
+	};
+	BYTE TileAmount;
+	QBertTileData** pTiles;
 };
 
 class QBertLevelReader final
 {
 public:
-	QBertLevelReader(const std::string& filePath);
+	QBertLevelReader();
 	~QBertLevelReader();
 
-	const QBertLevelData& ReadNextLevel();
+	const std::vector<QBertLevelData>& ReadLevelDatas(const std::string& filePath);
 	
 private:
-	std::ifstream m_Stream;
-	QBertLevelData m_CurrentLevel;
+	std::vector<QBertLevelData> m_LevelDatas;
 
 };

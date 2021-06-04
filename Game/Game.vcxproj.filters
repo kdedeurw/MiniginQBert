@@ -54,11 +54,23 @@
     <ClCompile Include="SoundTester.cpp">
       <Filter>Game Files</Filter>
     </ClCompile>
+    <ClCompile Include="QBertLevel.cpp">
+      <Filter>Assignments\QBert</Filter>
+    </ClCompile>
+    <ClCompile Include="QBertTile.cpp">
+      <Filter>Assignments\QBert</Filter>
+    </ClCompile>
+    <ClCompile Include="QBertLevelReader.cpp">
+      <Filter>Assignments\QBert</Filter>
+    </ClCompile>
+    <ClCompile Include="QBertGame.cpp">
+      <Filter>Assignments\QBert</Filter>
+    </ClCompile>
+    <ClCompile Include="QBertEntity.cpp">
+      <Filter>Assignments\QBert</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ColliderMasks.h">
-      <Filter>Header Files\Physics</Filter>
-    </ClInclude>
     <ClInclude Include="CharacterController.h">
       <Filter>Game Files</Filter>
     </ClInclude>
@@ -85,6 +97,21 @@
     </ClInclude>
     <ClInclude Include="SoundTester.h">
       <Filter>Game Files</Filter>
+    </ClInclude>
+    <ClInclude Include="QBertLevel.h">
+      <Filter>Assignments\QBert</Filter>
+    </ClInclude>
+    <ClInclude Include="QBertTile.h">
+      <Filter>Assignments\QBert</Filter>
+    </ClInclude>
+    <ClInclude Include="QBertLevelReader.h">
+      <Filter>Assignments\QBert</Filter>
+    </ClInclude>
+    <ClInclude Include="QBertEntity.h">
+      <Filter>Assignments\QBert</Filter>
+    </ClInclude>
+    <ClInclude Include="QBertGame.h">
+      <Filter>Assignments\QBert</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

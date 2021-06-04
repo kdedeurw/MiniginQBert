@@ -1,17 +1,10 @@
 #include "pch.h"
 #include "FPSComponent.h"
-#include "GameObject.h"
-#include "TransformComponent.h"
 
 #include <SDL.h>
 #include <SDL_ttf.h>
-#include "ResourceManager.h"
-#include "Renderer.h"
 #include "Font.h"
 #include "Texture2D.h"
-#include "Math.h"
-#include "GameState.h"
-#include "GlobalMemoryPools.h"
 
 FPSComponent::FPSComponent()
 	: m_FpsInterval{}

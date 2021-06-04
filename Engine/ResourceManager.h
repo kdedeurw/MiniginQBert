@@ -1,7 +1,6 @@
 #pragma once
 #include "SingletonRef.h"
 #include <map>
-#include <string>
 
 struct SDL_Texture;
 class Font;

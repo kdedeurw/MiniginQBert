@@ -5,19 +5,9 @@
 #include <vld.h>
 #endif
 
-#include "Math2D.h"
-#include "Vectors.h"
-#include "Collision2D.h"
-#include "RGBAColour.h"
+#include <SDL.h>
 
 #include "Core.h"
-#include "SceneManager.h"
-#include "ResourceManager.h"
-#include "GlobalMemoryPools.h"
-#include "GameState.h"
-#include "GameObject.h"
-#include "Components.h"
-#include "WindowInfo.h"
 
 //project includes
 #include "Subject.h"
@@ -70,30 +60,9 @@ void QBertScene()
 
 	QBertLevel* pLevel = gm.CreateComponent<QBertLevel>();
 	pGo->AddComponent(pLevel);
+	pGo->GetTransform().SetScale({2.f, 2.f});
 
-	//Player 1
-	//GameObject* pPlayer = scene.CreateGameObject();
-	//pPlayer->GetTransform().Translate(100.f, 350.f);
-
-	//QBertPlayer* pQBertPlayerComponent = gm.CreateComponent<QBertPlayer>();
-	//
-	//Subject* pSubject = gm.CreateSubject(1);
-	//pSubject->AddObserver(pObserver);
-	//pQBertPlayerComponent->SetSubject(pSubject);
-	//
-	//pPlayer->AddComponent(pQBertPlayerComponent);
-
-	//Player 2
-	//pPlayer = scene.CreateGameObject();
-	//pPlayer->GetTransform().Translate(100.f, 150.f);
-	//
-	//pQBertPlayerComponent = gm.CreateComponent<QBertPlayer>();
-	//
-	//pSubject = gm.CreateSubject(1);
-	//pSubject->AddObserver(pObserver);
-	//pQBertPlayerComponent->SetSubject(pSubject);
-	//
-	//pPlayer->AddComponent(pQBertPlayerComponent);
+	//TODO: observer
 }
 
 int main(int, char* [])
@@ -107,9 +76,8 @@ int main(int, char* [])
 
 	application.Run();
 
-	//TODO: add/fix pch
-
 	return 0;
+
 	//TODO: remove SDL2.dll's from System32 DONE
 	//TODO: add xcopy to post build events DONE
 	//TODO: test .dll's in build directory and run DONE - possible with game.lib and resources, no DLLs needed???

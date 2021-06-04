@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "DebugSoundSystem.h"
-#include <iostream>
 
 SoundId DebugSoundSystem::AddSound(const char* path, int volume)
 {

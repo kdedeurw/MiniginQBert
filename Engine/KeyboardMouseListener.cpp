@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "KeyboardMouseListener.h"
-#include <iostream>
-#include "GameState.h"
-#include "WindowInfo.h"
+#include <SDL.h>
 
 KeyboardMouseListener::KeyboardMouseListener()
 	: m_MousePos{}

@@ -1,12 +1,7 @@
 #include "pch.h"
 #include "QBertTile.h"
-#include "GameObject.h"
-#include "Components.h"
-#include "Scene.h"
 #include "Subject.h"
 #include "QBertEvents.h"
-#include "Texture2D.h"
-#include "GameState.h"
 
 const float QBertTile::m_TextureSize = 32.f;
 

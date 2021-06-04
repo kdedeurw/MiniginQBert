@@ -1,6 +1,5 @@
 #pragma once
 #include "QBertEntity.h"
-#include "Vectors.h"
 
 enum class TileState
 {
@@ -40,12 +39,12 @@ public:
 	static float GetTextureSize() { return m_TextureSize; }
 
 private:
+	friend class QBertLevel;
 	short m_Id;
 	TileState m_State;
 	Texture2DComponent* m_pTexture;
 	QBertEntity* m_pCurrentEntity;
 	Vector2 m_InitOffset;
-	friend class QBertLevel;
 	Neighbours m_Neighbours;
 
 	const static float m_TextureSize;

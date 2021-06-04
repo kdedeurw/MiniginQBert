@@ -24,6 +24,9 @@ public:
 	void DrawLine(Vector2 p1, Vector2 p2, RGBAColour colour = RGBAColour{ 255, 255, 255, 255 }, bool isCameraTransformations = true) const
 	{ DrawLine(std::move(p1.x), std::move(p1.y), std::move(p2.x), std::move(p2.y), colour, isCameraTransformations); }
 
+	//DEBUG FUNCTION ONLY!
+	void RenderTextImmediate(const std::string& text, Font* pFont, float x, float y, float scaleX = 1.f, float scaleY = 1.f, RGBAColour colour = {255, 255, 255, 255});
+
 	//function specifically designed for rendering SDL text
 	void RenderText(SDL_Texture* pTexture, float x, float y, float destX, float destY, float scaleX = 1.f, float scaleY = 1.f, float angle = 0.f, const Vector2& pivot = Vector2{ 0.5f, 0.5f }, RenderFlip flip = RenderFlip::None) const;
 	//will render without camera transformations

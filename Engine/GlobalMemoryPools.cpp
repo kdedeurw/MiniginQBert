@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "GlobalMemoryPools.h"
-#include "ResourceManager.h"
+
+#pragma warning(disable:6011)
 
 using namespace CustomMemoryAllocator;
 

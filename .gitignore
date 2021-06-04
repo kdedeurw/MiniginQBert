@@ -1,0 +1,17 @@
+# Don't track content of these folders
+
+.vs
+Dependencies
+Debug
+Release
+
+Engine/Debug
+Engine/Release
+
+Game/Debug
+Game/Release
+
+Enemies.txt
+PostBuildDLL.txt
+vld.props
+ExamProject.sln

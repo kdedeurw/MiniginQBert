@@ -1,16 +1,9 @@
 //Base includes
 #include "pch.h"
 #include "Core.h"
-#include <chrono>
 #include <thread>
-#include "Transform.h"
 #include "KeyboardMouseListener.h"
 #include "ControllerListener.h"
-#include "SceneManager.h"
-#include "Renderer.h"
-#include "ResourceManager.h"
-#include "GameObject.h"
-#include "Scene.h"
 
 //SDL includes
 #include <SDL.h>
@@ -19,9 +12,6 @@
 #include <SDL_mixer.h>
 
 //Project includes
-#include "Timer.h"
-#include "Components.h"
-#include "GameState.h"
 #include "ServiceLocator.h"
 #include "SoundSystem.h"
 
