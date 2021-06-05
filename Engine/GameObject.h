@@ -27,11 +27,11 @@ public:
 	void AddComponent(Component* pComponent);
 	template <typename T>
 	T* GetComponent() const;
-	void RemoveComponent(Component* pComponent);
+	void RemoveComponent(Component* pComponent, bool isDelete = false);
 
 	void AddChildObject(GameObject* pChild);
 	const std::vector<GameObject*>& GetChildren() { return m_pChildren; }
-	void RemoveChildObject(GameObject* pChild);
+	void RemoveChildObject(GameObject* pChild, bool isDelete = false);
 
 	void SetActive(bool isActive) { m_IsActive = isActive; }
 	bool IsActive() const { return m_IsActive; }

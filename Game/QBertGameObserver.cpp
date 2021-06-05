@@ -2,6 +2,7 @@
 #include "QBertGameObserver.h"
 #include "QBertEvents.h"
 #include "QBertPlayer.h"
+#include "QBertTile.h"
 
 QBertGameObserver::QBertGameObserver()
 {
@@ -13,43 +14,152 @@ QBertGameObserver::~QBertGameObserver()
 
 void QBertGameObserver::OnNotify(GameObject* pGameObject, int event)
 {
-	switch ((QBertEvent)event)
+	switch (static_cast<QBertEvent>(event))
 	{
-	case QBertEvent::event_player1_die:
+	case QBertEvent::event_player_die:
 	{
 		QBertPlayer* pPlayer = pGameObject->GetComponent<QBertPlayer>();
 		if (pPlayer)
 		{
-			std::cout << "Player 1 died\n";
-
-			//TODO: respawn player
-			--m_Player1Stats.Lives;
-			pPlayer->Respawn();
+			if (pPlayer->GetId() == PlayerId::Player1)
+			{
+				--m_Player1Stats.Lives;
+				m_Player1Stats.Score -= 100;
+				std::cout << "Player 1 died, lives left: " << m_Player1Stats.Lives << '\n';
+			}
+			else
+			{
+				--m_Player2Stats.Lives;
+				m_Player2Stats.Score -= 100;
+				std::cout << "Player 2 died, lives left: " << m_Player2Stats.Lives << '\n';
+			}
 		}
 		break;
 	}
-	case QBertEvent::event_player2_die:
-		--m_Player2Stats.Lives;
-		break;
 	case QBertEvent::event_tile_colour_change_intermediate:
-		m_Player1Stats.Score += 20;
+	{
+		QBertTile* pTile = pGameObject->GetComponent<QBertTile>();
+		if (pTile)
+		{
+			QBertPlayer* pPlayer = dynamic_cast<QBertPlayer*>(pTile->GetCurrentCharacter());
+			if (pPlayer)
+			{
+				if (pPlayer->GetId() == PlayerId::Player1)
+					m_Player1Stats.Score += 20;
+				else
+					m_Player2Stats.Score += 20;
+			}
+		}
+		else
+			m_Player1Stats.Score += 20;
 		break;
+	}
 	case QBertEvent::event_tile_colour_change_final:
-		m_Player1Stats.Score += 30;
+	{
+		QBertTile* pTile = pGameObject->GetComponent<QBertTile>();
+		if (pTile)
+		{
+			QBertPlayer* pPlayer = dynamic_cast<QBertPlayer*>(pTile->GetCurrentCharacter());
+			if (pPlayer)
+			{
+				if (pPlayer->GetId() == PlayerId::Player1)
+					m_Player1Stats.Score += 30;
+				else
+					m_Player2Stats.Score += 30;
+			}
+		}
+		else
+			m_Player1Stats.Score += 30;
 		break;
+	}
 	case QBertEvent::event_green_ball_catched:
-		m_Player1Stats.Score += 100;
+	{
+		QBertPlayer* pPlayer = pGameObject->GetComponent<QBertPlayer>();
+		if (pPlayer)
+		{
+			if (pPlayer->GetId() == PlayerId::Player1)
+			{
+				m_Player1Stats.Score += 100;
+				std::cout << "Player 1 caught a green ball, score: " << m_Player1Stats.Score << '\n';
+			}
+			else
+			{
+				m_Player2Stats.Score += 100;
+				std::cout << "Player 2 caught a green ball, score: " << m_Player2Stats.Score << '\n';
+			}
+		}
 		break;
+	}
 	case QBertEvent::event_coily_killed:
-		m_Player1Stats.Score += 500;
+	{
+		QBertPlayer* pPlayer = pGameObject->GetComponent<QBertPlayer>();
+		if (pPlayer)
+		{
+			if (pPlayer->GetId() == PlayerId::Player1)
+			{
+				m_Player1Stats.Score += 500;
+				std::cout << "Player 1 killed a coily, score: " << m_Player1Stats.Score << '\n';
+			}
+			else
+			{
+				m_Player2Stats.Score += 500;
+				std::cout << "Player 2 killed a coily, score: " << m_Player2Stats.Score << '\n';
+			}
+		}
 		break;
+	}
 	case QBertEvent::event_slick_catched:
-		m_Player1Stats.Score += 300;
+	{
+		QBertPlayer* pPlayer = pGameObject->GetComponent<QBertPlayer>();
+		if (pPlayer)
+		{
+			if (pPlayer->GetId() == PlayerId::Player1)
+			{
+				m_Player1Stats.Score += 300;
+				std::cout << "Player 1 caught a slick, score: " << m_Player1Stats.Score << '\n';
+			}
+			else
+			{
+				m_Player2Stats.Score += 500;
+				std::cout << "Player 2 caught a slick, score: " << m_Player2Stats.Score << '\n';
+			}
+		}
 		break;
+	}
 	case QBertEvent::event_sam_catched:
-		m_Player1Stats.Score += 300;
+	{
+		QBertPlayer* pPlayer = pGameObject->GetComponent<QBertPlayer>();
+		if (pPlayer)
+		{
+			if (pPlayer->GetId() == PlayerId::Player1)
+			{
+				m_Player1Stats.Score += 300;
+				std::cout << "Player 1 caught a sam, score: " << m_Player1Stats.Score << '\n';
+			}
+			else
+			{
+				m_Player2Stats.Score += 500;
+				std::cout << "Player 2 caught a sam, score: " << m_Player2Stats.Score << '\n';
+			}
+		}
 		break;
+	}
+	case QBertEvent::event_round_complete:
+	{
+		m_Player1Stats.Score += 1000;
+		m_Player2Stats.Score += 1000;
+		std::cout << "Round complete event\n";
+		break;
+	}
+	case QBertEvent::event_level_complete:
+	{
+		m_Player1Stats.Score += 1000;
+		m_Player2Stats.Score += 1000;
+		std::cout << "Level complete event\n";
+		break;
+	}
 	default:
+		std::cout << "Wrong/unimplemented event\n";
 		break;
 	}
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include "QBertEntity.h"
+#include "Component.h"
 
 enum class TileState
 {
@@ -8,8 +8,9 @@ enum class TileState
 	TargetState,
 };
 
+class QBertCharacter;
 class Texture2DComponent;
-class QBertTile final : public QBertEntity
+class QBertTile final : public Component
 {
 public:
 	QBertTile();
@@ -19,12 +20,17 @@ public:
 	virtual void Render() const override;
 	virtual void Update() override;
 
-	TileState GetState() const { return m_State; }
-	void UpdateState(TileState state);
-	QBertEntity* GetEntity() const { return m_pCurrentEntity; }
-	void UpdateEntity(QBertEntity* pEntity) { m_pCurrentEntity = pEntity; }
+	void Reset();
 
-	short GetTileId() const { return m_Id; }
+	TileState GetState() const { return m_State; }
+	void SetState(TileState state);
+
+	QBertCharacter* GetCurrentCharacter() const { return m_pCurrentCharacter; }
+	void EnterCharacter(QBertCharacter* pNewCharacter);
+	void LeaveCharacter();
+
+	Subject* GetSubject() const { return m_pSubject; }
+	short GetId() const { return m_Id; }
 
 	struct Neighbours
 	{
@@ -40,13 +46,18 @@ public:
 
 private:
 	friend class QBertLevel;
+	bool m_HasBeenIntermediateState, m_HasBeenTargetState;
 	short m_Id;
 	TileState m_State;
 	Texture2DComponent* m_pTexture;
-	QBertEntity* m_pCurrentEntity;
-	Vector2 m_InitOffset;
+	QBertCharacter* m_pCurrentCharacter;
+	Subject* m_pSubject;
 	Neighbours m_Neighbours;
 
-	const static float m_TextureSize;
+	void EvaluateCharacterConflict(QBertCharacter* pNewCharacter);
+
+	static int m_TextureId;
+	static const float m_TextureSize;
+	static Vector2 m_TextureOffset;
 
 };

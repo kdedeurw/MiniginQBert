@@ -1,78 +1,78 @@
 {
-	"leveldifficulties":
+	"levels":
 	[
 		{
-			"level":1
-			"steps":1
-			"can_go_back":false
+			"level":1,
+			"steps":1,
+			"can_go_back":false,
 			"rounds":
 			[
 				{
-					"round":1
+					"round":1,
 					"enemies":"CRRRR"
 				},
 				{
-					"round":2
+					"round":2,
 					"enemies":"CRRRR"
 				},
 				{
-					"round":3
+					"round":3,
 					"enemies":"UWCUWCUWCUWG"
 				},
 				{
-					"round":4
+					"round":4,
 					"enemies":"RRRRCRRRG"
-				},
+				}
 			]
 		},
 		{
-			"level":2
-			"steps":2
-			"can_go_back":false
+			"level":2,
+			"steps":2,
+			"can_go_back":false,
 			"rounds":
 			[
 				{
-					"round":1
+					"round":1,
 					"enemies":"UWCUWCUWCUWG"
 				},
 				{
-					"round":2
+					"round":2,
 					"enemies":"UWGSCUWCUWSCUWCS"
 				},
 				{
-					"round":3
+					"round":3,
 					"enemies":"RRRCRRRRGRRRCS"
 				},
 				{
-					"round":4
+					"round":4,
 					"enemies":"RSCUWURRWSRCSRCUWURGRUWRS"
-				},
+				}
 			]
 		},
 		{
-			"level":3
-			"steps":1
-			"can_go_back":true
+			"level":3,
+			"steps":1,
+			"can_go_back":true,
 			"rounds":
 			[
 				{
-					"round":1
+					"round":1,
 					"enemies":"RRRCRRRGRCRRSRR"
 				},
 				{
-					"round":2
+					"round":2,
 					"enemies":"RSCWUWRCRUSRCUSWRCUWWRGRCWCURSCW"
 				},
 				{
-					"round":3
+					"round":3,
 					"enemies":"RSCWUWRCRUSRUSWRCUWWRGRCWU"
 				},
 				{
-					"round":4
+					"round":4,
 					"enemies":"RSCWUWRCRUSRCUSWRCUWWRGRCWCU"
-				},
+				}
 			]
-		},
+		}
 	],
 	"tiles":
 	[
@@ -104,5 +104,6 @@
 		{ "id":25, "pos":[], "connections":[] },
 		{ "id":26, "pos":[], "connections":[] },
 		{ "id":27, "pos":[], "connections":[] }
-	]
+	],
+	"tileAmount":28
 }

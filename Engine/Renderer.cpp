@@ -78,7 +78,7 @@ void Renderer::DrawLine(float x1, float y1, float x2, float y2, RGBAColour colou
 	SDL_SetRenderDrawColor(m_pRenderer, 0, 0, 0, 0);
 }
 
-void Renderer::RenderTextImmediate(const std::string& text, Font* pFont, float x, float y, float scaleX, float scaleY, RGBAColour colour)
+void Renderer::DrawTextImmediate(const std::string& text, Font* pFont, float x, float y, float scaleX, float scaleY, RGBAColour colour)
 {
 	SDL_Surface* pSurface = TTF_RenderText_Blended(pFont->GetFont(), text.c_str(), reinterpret_cast<SDL_Color&>(colour));
 	if (!pSurface)

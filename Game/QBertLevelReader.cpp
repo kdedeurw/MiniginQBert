@@ -6,16 +6,17 @@
 #include <rapidjson/stream.h>
 #include <rapidjson/filereadstream.h>
 
-QBertLevelReader::QBertLevelReader()
-{
-}
+std::vector<QBertLevelData> QBertLevelReader::m_LevelDatas{};
 
-QBertLevelReader::~QBertLevelReader()
+const std::vector<QBertLevelData>& QBertLevelReader::GetLevelData(const std::string& filePath, bool isOverWrite)
 {
-}
+	if (!m_LevelDatas.empty())
+	{
+		if (!isOverWrite)
+			return m_LevelDatas;
+		m_LevelDatas.clear();
+	}
 
-const std::vector<QBertLevelData>& QBertLevelReader::ReadLevelDatas(const std::string& filePath)
-{
 	using rapidjson::Document;
 	Document jsonDoc;
 	FILE* fp = nullptr;

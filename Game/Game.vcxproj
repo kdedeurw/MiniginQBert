@@ -21,7 +21,8 @@
   <ItemGroup>
     <ClCompile Include="CameraTester.cpp" />
     <ClCompile Include="CharacterController.cpp" />
-    <ClCompile Include="QBertEntity.cpp" />
+    <ClCompile Include="QBertCharacter.cpp" />
+    <ClCompile Include="QBertCharacterMovement.cpp" />
     <ClCompile Include="QBertGame.cpp" />
     <ClCompile Include="QBertLevelReader.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -35,6 +36,7 @@
     <ClCompile Include="QBertGameObserver.cpp" />
     <ClCompile Include="QBertLevel.cpp" />
     <ClCompile Include="QBertPlayer.cpp" />
+    <ClCompile Include="QBertRedBall.cpp" />
     <ClCompile Include="QBertTile.cpp" />
     <ClCompile Include="SoundTester.cpp" />
   </ItemGroup>
@@ -42,7 +44,8 @@
     <ClInclude Include="CameraTester.h" />
     <ClInclude Include="catch.hpp" />
     <ClInclude Include="CharacterController.h" />
-    <ClInclude Include="QBertEntity.h" />
+    <ClInclude Include="QBertCharacter.h" />
+    <ClInclude Include="QBertCharacterMovement.h" />
     <ClInclude Include="QBertGame.h" />
     <ClInclude Include="QBertLevelReader.h" />
     <ClInclude Include="QBertEvents.h" />
@@ -51,6 +54,7 @@
     <ClInclude Include="QBertGameObserver.h" />
     <ClInclude Include="QBertLevel.h" />
     <ClInclude Include="QBertPlayer.h" />
+    <ClInclude Include="QBertRedBall.h" />
     <ClInclude Include="QBertTile.h" />
     <ClInclude Include="SoundTester.h" />
   </ItemGroup>
@@ -168,8 +172,10 @@
       </Command>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy "$(SolutionDir)3rdParty\SDL2\lib\$(PlatformTarget)\SDL2.dll" "$(OutputPath)" /R /Y
+xcopy "$(SolutionDir)3rdParty\SDL2_image\lib\$(PlatformTarget)\*.dll" "$(OutputPath)" /R /Y
+xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\$(PlatformTarget)\*.dll" "$(OutputPath)" /R /Y
+xcopy "$(SolutionDir)3rdParty\SDL2_mixer-2.0.4\lib\$(PlatformTarget)\SDL2_mixer.dll" "$(OutputPath)" /R /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -197,8 +203,10 @@
       </Command>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy "$(SolutionDir)3rdParty\SDL2\lib\$(PlatformTarget)\SDL2.dll" "$(OutputPath)" /R /Y
+xcopy "$(SolutionDir)3rdParty\SDL2_image\lib\$(PlatformTarget)\*.dll" "$(OutputPath)" /R /Y
+xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\$(PlatformTarget)\*.dll" "$(OutputPath)" /R /Y
+xcopy "$(SolutionDir)3rdParty\SDL2_mixer-2.0.4\lib\$(PlatformTarget)\SDL2_mixer.dll" "$(OutputPath)" /R /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -230,8 +238,10 @@
       </Command>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy "$(SolutionDir)3rdParty\SDL2\lib\$(PlatformTarget)\SDL2.dll" "$(OutputPath)" /R /Y
+xcopy "$(SolutionDir)3rdParty\SDL2_image\lib\$(PlatformTarget)\*.dll" "$(OutputPath)" /R /Y
+xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\$(PlatformTarget)\*.dll" "$(OutputPath)" /R /Y
+xcopy "$(SolutionDir)3rdParty\SDL2_mixer-2.0.4\lib\$(PlatformTarget)\SDL2_mixer.dll" "$(OutputPath)" /R /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -263,8 +273,10 @@
       </Command>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy "$(SolutionDir)3rdParty\SDL2\lib\$(PlatformTarget)\SDL2.dll" "$(OutputPath)" /R /Y
+xcopy "$(SolutionDir)3rdParty\SDL2_image\lib\$(PlatformTarget)\*.dll" "$(OutputPath)" /R /Y
+xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\$(PlatformTarget)\*.dll" "$(OutputPath)" /R /Y
+xcopy "$(SolutionDir)3rdParty\SDL2_mixer-2.0.4\lib\$(PlatformTarget)\SDL2_mixer.dll" "$(OutputPath)" /R /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

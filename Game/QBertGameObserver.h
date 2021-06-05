@@ -22,4 +22,7 @@ private:
     PlayerStats m_Player1Stats;
     PlayerStats m_Player2Stats;
 
+    //TODO: level reset after all tiles are target
+    //TODO: draw player stats
+
 };

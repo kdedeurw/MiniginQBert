@@ -5,6 +5,7 @@
 #include <vld.h>
 #endif
 
+//_SDL_main
 #include <SDL.h>
 
 #include "Core.h"
@@ -63,6 +64,10 @@ void QBertScene()
 	pGo->GetTransform().SetScale({2.f, 2.f});
 
 	//TODO: observer
+
+	//TODO: enemies + AI
+
+	//TODO: use command pattern
 }
 
 int main(int, char* [])
@@ -77,11 +82,4 @@ int main(int, char* [])
 	application.Run();
 
 	return 0;
-
-	//TODO: remove SDL2.dll's from System32 DONE
-	//TODO: add xcopy to post build events DONE
-	//TODO: test .dll's in build directory and run DONE - possible with game.lib and resources, no DLLs needed???
-	//TODO: Dependencies folder? DONE - not needed, only during compile
-
-	//TODO: add $(Configuration) to postbuild events
 }

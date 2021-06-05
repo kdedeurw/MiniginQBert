@@ -31,12 +31,12 @@ struct QBertLevelLayout
 class QBertLevelReader final
 {
 public:
-	QBertLevelReader();
-	~QBertLevelReader();
+	QBertLevelReader() = delete;
+	~QBertLevelReader() = delete;
 
-	const std::vector<QBertLevelData>& ReadLevelDatas(const std::string& filePath);
+	static const std::vector<QBertLevelData>& GetLevelData(const std::string& filePath, bool isOverWrite = false);
 	
 private:
-	std::vector<QBertLevelData> m_LevelDatas;
+	static std::vector<QBertLevelData> m_LevelDatas;
 
 };

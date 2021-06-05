@@ -82,13 +82,16 @@ void GameObject::AddComponent(Component* pComponent)
 	}
 }
 
-void GameObject::RemoveComponent(Component* pComponent)
+void GameObject::RemoveComponent(Component* pComponent, bool isDelete)
 {
 	const std::vector<Component*>::iterator it = std::find(m_pComponents.begin(), m_pComponents.end(), pComponent);
 	if (it != m_pComponents.end())
 	{
 		m_pComponents.erase(it);
-		(*it)->m_pGameObject = nullptr;
+		if (isDelete)
+			delete *it;
+		else
+			(*it)->m_pGameObject = nullptr;
 	}
 }
 
@@ -102,13 +105,18 @@ void GameObject::AddChildObject(GameObject* pChild)
 	}
 }
 
-void GameObject::RemoveChildObject(GameObject* pChild)
+void GameObject::RemoveChildObject(GameObject* pChild, bool isDelete)
 {
 	const std::vector<GameObject*>::iterator it = std::find(m_pChildren.begin(), m_pChildren.end(), pChild);
 	if (it != m_pChildren.end())
 	{
 		m_pChildren.erase(it);
-		pChild->m_pParent = nullptr;
-		pChild->GetTransform().Initialize();
+		if (isDelete)
+			delete pChild;
+		else
+		{
+			pChild->m_pParent = nullptr;
+			pChild->GetTransform().Initialize();
+		}
 	}
 }
