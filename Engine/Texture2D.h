@@ -4,7 +4,7 @@
 #include "RenderFlip.h"
 
 struct SDL_Texture;
-class Texture2D final : public Texture
+class Texture2D final
 {
 public:
 	explicit Texture2D(SDL_Texture* pTexture = nullptr);
@@ -17,9 +17,8 @@ public:
 	bool InitializeTexture();
 
 	void SetFlip(RenderFlip flip);
-	//easily switch textures
-	void SetTexture(SDL_Texture* pTexture);
 	//load in new texture (new textures take time to load)
+	//existing ones can be gathered from a list
 	void SetTexture(const std::string& fileAsset);
 	//the rectangle from where the renderer should sample the texture from (entire texture dimensions by default)
 	//x being X sample offset, y being Y sample offset, z being Width (default texture width), w being Height (default texture height)
@@ -34,12 +33,13 @@ public:
 	Vector4& GetSourceRect();
 	Vector4& GetDestRect();
 	const Vector2& GetDimensions() const;
+	SDL_Texture* GetSDLTexture() const { return m_pTexture; }
 
-protected:
+private:
+	SDL_Texture* m_pTexture; //shared_ptr?
 	RenderFlip m_Flip;
 	Vector2 m_Dimensions;
 	Vector4 m_SourceRect;
 	Vector4 m_DestRect;
 
-private:
 };

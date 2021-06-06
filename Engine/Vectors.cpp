@@ -184,7 +184,7 @@ void operator/=(Vector2& lhs, const float scalar)
 
 float Math2D::Magnitude(const Vector2& lhs)
 {
-	return sqrtf(powf(lhs.x, 2) + powf(lhs.y, 2));
+	return fabs(sqrtf(powf(lhs.x, 2) + powf(lhs.y, 2)));
 }
 
 float Math2D::Dot(const Vector2& lhs, const Vector2& rhs)
@@ -302,7 +302,7 @@ void operator/=(Vector3& lhs, const float scalar)
 
 float Math2D::Magnitude(const Vector3& lhs)
 {
-	return sqrtf(powf(lhs.x, 2) + powf(lhs.y, 2) + powf(lhs.z, 2));
+	return fabs(sqrtf(powf(lhs.x, 2) + powf(lhs.y, 2) + powf(lhs.z, 2)));
 }
 
 float Math2D::Dot(const Vector3& lhs, const Vector3& rhs)

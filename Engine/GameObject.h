@@ -7,29 +7,31 @@ class Scene;
 class GameObject final
 {
 public:
+	friend class GlobalMemoryPools;
+	explicit GameObject();
 	virtual ~GameObject() noexcept;
 	GameObject(const GameObject & other) = delete;
 	GameObject(GameObject && other) = delete;
 	GameObject& operator=(const GameObject & other) = delete;
 	GameObject& operator=(GameObject && other) = delete;
 
-	virtual void Initialize();
-	virtual void Update();
-	virtual void Render() const;
-	virtual void PostRender() const;
+	void Initialize(bool forceInitialize = false);
+	void Update();
+	void Render() const;
+	void PostRender() const;
 
-	TransformComponent& GetTransform() const { return m_Transform; }
+	TransformComponent& GetTransform() const { return *m_pTransform; }
 	GameObject& GetParent() const { return *m_pParent; }
 	Scene& GetScene() const { return *m_pScene; }
 
 	const unsigned int GetId() const { return m_Id; }
 
-	void AddComponent(Component* pComponent);
+	void AddComponent(Component* pComponent, bool isInitialize = false);
 	template <typename T>
 	T* GetComponent() const;
 	void RemoveComponent(Component* pComponent, bool isDelete = false);
 
-	void AddChildObject(GameObject* pChild);
+	void AddChildObject(GameObject* pChild, bool isInitialize = true);
 	const std::vector<GameObject*>& GetChildren() { return m_pChildren; }
 	void RemoveChildObject(GameObject* pChild, bool isDelete = false);
 
@@ -43,12 +45,9 @@ private:
 	unsigned int m_Id;
 	Scene* m_pScene;
 
-	bool m_IsActive, m_IsRendered;
-	TransformComponent& m_Transform;
+	bool m_IsInitialized, m_IsActive, m_IsRendered;
+	TransformComponent* m_pTransform;
 	GameObject* m_pParent;
-
-	friend class GlobalMemoryPools;
-	explicit GameObject(TransformComponent& transform);
 
 	std::vector<Component*> m_pComponents;
 	std::vector<GameObject*> m_pChildren;

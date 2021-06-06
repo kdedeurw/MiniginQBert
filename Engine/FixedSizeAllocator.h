@@ -103,7 +103,7 @@ template <typename T>
 void* FixedSizeAllocator<T>::Acquire(size_t)
 {
 	if (m_FreeBlocks == 0)
-		throw std::exception("out of memory");
+		throw std::exception("FixedSizeAllocator>Acquire: out of memory");
 	if (m_pLast->status == Status::free)
 	{
 		Block* pFormerLast{ m_pLast };
@@ -112,7 +112,7 @@ void* FixedSizeAllocator<T>::Acquire(size_t)
 		--m_FreeBlocks;
 		return pFormerLast->data; //return reserved block's data to be used
 	}
-	throw std::exception("out of memory");
+	throw std::exception("FixedSizeAllocator>Acquire: out of memory");
 }
 
 template <typename T>

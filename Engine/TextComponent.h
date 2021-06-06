@@ -4,7 +4,6 @@
 #include <string>
 
 class Font;
-class Texture;
 struct SDL_Texture;
 struct Vector2;
 class TextComponent : public Component
@@ -17,7 +16,7 @@ public:
 	TextComponent& operator=(const TextComponent& other) = delete;
 	TextComponent& operator=(TextComponent&& other) = delete;
 
-	void Initialize() override;
+	void Initialize(bool forceInitialize = false) override;
 	void Update() override;
 	void Render() const override;
 
@@ -26,7 +25,7 @@ public:
 	void SetColour(RGBAColour colour);
 	Vector2& GetOffset() { return m_Offset; };
 	//texturedata might NOT always be valid, be sure what you're doing here!
-	Texture* GetTextureData() const { return m_pTextureData; };
+	Texture* GetTextureData() const { return m_pTextureData; }
 
 private:
 	bool m_NeedsUpdate;

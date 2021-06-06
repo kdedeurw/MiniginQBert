@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "Scene.h"
 #include "GameObject.h"
-#include "GlobalMemoryPools.h"
-#include "MemoryAllocator.h"
 #include <algorithm>
 
 unsigned int Scene::m_IdCounter = 0;
@@ -31,7 +29,8 @@ Scene::~Scene()
 
 GameObject* Scene::CreateGameObject()
 {
-	GameObject* pGameObject = GlobalMemoryPools::GetInstance().CreateGameObject();
+	//GameObject* pGameObject = GlobalMemoryPools::GetInstance().CreateGameObject();
+	GameObject* pGameObject = new GameObject{};
 	pGameObject->m_Id = m_IdCounter;
 	++m_IdCounter;
 	m_GameObjects.push_back(pGameObject);

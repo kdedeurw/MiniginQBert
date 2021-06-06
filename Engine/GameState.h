@@ -3,7 +3,7 @@
 #include "Timer.h"
 #include "KeyboardMouseListener.h"
 #include "ControllerListener.h"
-#include "GlobalMemoryPools.h"
+//#include "GlobalMemoryPools.h"
 #include "Camera.h"
 
 class Scene;
@@ -25,7 +25,7 @@ public:
 	Timer<high_resolution_clock> Timer{};
 	KeyboardMouseListener& KeyboardMouseListener{ KeyboardMouseListener::GetInstance() };
 	ControllerListener& ControllerListener{ ControllerListener::GetInstance() };
-	GlobalMemoryPools& GlobalMemoryPools{ GlobalMemoryPools::GetInstance() };
+	//GlobalMemoryPools& GlobalMemoryPools{ GlobalMemoryPools::GetInstance() };
 	Camera Camera{};
 
 private:

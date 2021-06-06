@@ -1,7 +1,7 @@
 #pragma once
 
 struct SDL_Texture;
-class Texture
+class Texture final
 {
 public:
 	explicit Texture(SDL_Texture* pTexture = nullptr);
@@ -11,7 +11,7 @@ public:
 	Texture& operator=(const Texture&) = delete;
 	Texture& operator=(const Texture&&) = delete;
 
-	SDL_Texture* GetSDLTexture() const { return m_pTexture; };
+	SDL_Texture* GetSDLTexture() const { return m_pTexture; }
 
 protected:
 	SDL_Texture* m_pTexture;

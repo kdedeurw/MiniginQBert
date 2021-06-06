@@ -8,7 +8,7 @@ public:
 	SoundTester();
 	~SoundTester();
 
-	virtual void Initialize() override;
+	virtual void Initialize(bool forceInitialize = false) override;
 	virtual void Update() override;
 	virtual void Render() const override;
 

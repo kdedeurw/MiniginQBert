@@ -9,16 +9,17 @@
 #include "Math2D.h"
 #include "Subject.h"
 
-GameObject::GameObject(TransformComponent& transform)
-	: m_Transform{ transform }
+GameObject::GameObject()
+	: m_pTransform{ new TransformComponent{} }
 	, m_pComponents{}
 	, m_pChildren{}
-	, m_pParent{}
+	, m_pParent{ nullptr }
 	, m_IsActive{ true }
 	, m_IsRendered{ true }
+	, m_IsInitialized{ false }
 	, m_Id{ UINT32_MAX }
 {
-	AddComponent(&transform);
+	AddComponent(m_pTransform, true);
 }
 
 GameObject::~GameObject() noexcept
@@ -32,12 +33,17 @@ GameObject::~GameObject() noexcept
 	m_pComponents.clear();
 }
 
-void GameObject::Initialize()
+void GameObject::Initialize(bool forceInitialize)
 {
+	if (!forceInitialize && m_IsInitialized)
+		return;
+
 	for (Component* pComponent : m_pComponents)
 	{
 		pComponent->Initialize();
 	}
+
+	m_IsInitialized = true;
 }
 
 void GameObject::Update()
@@ -79,12 +85,14 @@ void GameObject::PostRender() const
 	}
 }
 
-void GameObject::AddComponent(Component* pComponent)
+void GameObject::AddComponent(Component* pComponent, bool isInitialize)
 {
 	if (std::find(m_pComponents.begin(), m_pComponents.end(), pComponent) == m_pComponents.end())
 	{
 		m_pComponents.push_back(pComponent);
 		pComponent->m_pGameObject = this;
+		if (isInitialize)
+			pComponent->Initialize();
 	}
 }
 
@@ -101,12 +109,17 @@ void GameObject::RemoveComponent(Component* pComponent, bool isDelete)
 	}
 }
 
-void GameObject::AddChildObject(GameObject* pChild)
+void GameObject::AddChildObject(GameObject* pChild, bool isInitialize)
 {
 	if (std::find(m_pChildren.begin(), m_pChildren.end(), pChild) == m_pChildren.end())
 	{
 		m_pChildren.push_back(pChild);
 		pChild->m_pParent = this;
+		if (isInitialize)
+		{
+			pChild->Initialize();
+			return;
+		}
 		pChild->GetTransform().Initialize();
 	}
 }

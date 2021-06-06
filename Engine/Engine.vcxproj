@@ -27,7 +27,6 @@
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="FPSComponent.cpp" />
     <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="GlobalMemoryPools.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="KeyboardMouseListener.cpp" />
     <ClCompile Include="Math2D.cpp" />
@@ -75,13 +74,10 @@
     <ClInclude Include="FPSComponent.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameState.h" />
-    <ClInclude Include="GlobalMemoryPools.h" />
-    <ClInclude Include="Globals.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="KeyboardMouseListener.h" />
     <ClInclude Include="Math2D.h" />
     <ClInclude Include="MemoryAllocator.h" />
-    <ClInclude Include="MemoryOverrides.h" />
     <ClInclude Include="Core.h" />
     <ClInclude Include="Observer.h" />
     <ClInclude Include="pch.h" />

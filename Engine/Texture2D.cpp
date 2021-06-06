@@ -4,13 +4,15 @@
 #include <SDL.h>
 
 Texture2D::Texture2D(SDL_Texture* pTexture)
-	: Texture{ pTexture }
+	: m_pTexture{ pTexture }
 	, m_Flip{ RenderFlip::None }
 	//chose not to initialize other member variables since they need to be forcefully set in Init
 {}
 
 Texture2D::~Texture2D()
-{};
+{
+	m_pTexture = nullptr;
+};
 
 const Vector2& Texture2D::GetDimensions() const
 {
@@ -36,15 +38,9 @@ void Texture2D::SetFlip(RenderFlip flip)
 	m_Flip = flip;
 }
 
-void Texture2D::SetTexture(SDL_Texture* pTexture)
-{
-	m_pTexture = pTexture;
-	InitializeTexture();
-}
-
 void Texture2D::SetTexture(const std::string& fileAsset)
 {
-	m_pTexture = ResourceManager::GetInstance().LoadTexture(fileAsset);
+	m_pTexture = ResourceManager::GetInstance().LoadTexture(fileAsset)->GetSDLTexture();
 	InitializeTexture();
 }
 

@@ -14,20 +14,33 @@ SpriteComponent::SpriteComponent()
 SpriteComponent::~SpriteComponent()
 {}
 
-void SpriteComponent::Initialize()
+void SpriteComponent::Initialize(bool forceInitialize)
 {
+	if (!forceInitialize && m_IsInitialized)
+		return;
+
 	//Set init frame coords
 	Vector4& srcRect = m_pTexture->GetSourceRect();
 	if (m_Layout == SpriteLayout::Horizontal)
 	{
-		srcRect.x = srcRect.z * (m_CurrentFrame % m_MaxXFrames) + m_InitOffset.x;
-		srcRect.y = srcRect.w * (m_CurrentFrame / m_MaxYFrames) + m_InitOffset.y;
+		srcRect.x = srcRect.z * (m_CurrentFrame % m_MaxXFrames);
+		srcRect.x += m_InitOffset.x;
+		if (m_MaxYFrames > 1)
+			srcRect.y = srcRect.w * (m_CurrentFrame / m_MaxYFrames) + m_InitOffset.y;
+		else
+			srcRect.y += m_InitOffset.y;
 	}
 	else
 	{
-		srcRect.x = srcRect.z * (m_CurrentFrame / m_MaxXFrames) + m_InitOffset.x;
-		srcRect.y = srcRect.w * (m_CurrentFrame % m_MaxYFrames) + m_InitOffset.y;
+		if (m_MaxXFrames > 1)
+			srcRect.x = srcRect.z * (m_CurrentFrame / m_MaxXFrames) + m_InitOffset.x;
+		else
+			srcRect.x += m_InitOffset.x;
+		srcRect.y = srcRect.w * (m_CurrentFrame % m_MaxYFrames);
+		srcRect.y += m_InitOffset.y;
 	}
+
+	m_IsInitialized = true;
 }
 
 void SpriteComponent::Update()
@@ -47,18 +60,25 @@ void SpriteComponent::Update()
 			m_CurrentFrame = 0;
 		m_Tick = 0;
 		
+		//TODO: 'clean'
 		Vector4& srcRect = m_pTexture->GetSourceRect();
 		if (m_Layout == SpriteLayout::Horizontal)
 		{
-			srcRect.x = srcRect.z * (m_CurrentFrame % m_MaxXFrames) + m_InitOffset.x;
+			srcRect.x = srcRect.z * (m_CurrentFrame % m_MaxXFrames);
+			srcRect.x += m_InitOffset.x;
 			if (m_MaxYFrames > 1)
-				srcRect.y = srcRect.w * (m_CurrentFrame / m_MaxYFrames) + m_InitOffset.y;
+				srcRect.y = srcRect.w * (m_CurrentFrame / m_MaxYFrames);
+			else
+				srcRect.y = m_InitOffset.y;
 		}
 		else
 		{
 			if (m_MaxXFrames > 1)
-				srcRect.x = srcRect.z * (m_CurrentFrame / m_MaxXFrames) + m_InitOffset.x;
-			srcRect.y = srcRect.w * (m_CurrentFrame % m_MaxYFrames) + m_InitOffset.y;
+				srcRect.x = srcRect.z * (m_CurrentFrame / m_MaxXFrames);
+			else
+				srcRect.x = m_InitOffset.x;
+			srcRect.y = srcRect.w * (m_CurrentFrame % m_MaxYFrames);
+			srcRect.y += m_InitOffset.y;
 		}
 	}
 }

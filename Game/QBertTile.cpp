@@ -30,14 +30,19 @@ QBertTile::~QBertTile()
 	m_pSubject = nullptr;
 }
 
-void QBertTile::Initialize()
+void QBertTile::Initialize(bool forceInitialize)
 {
+	if (!forceInitialize && m_IsInitialized)
+		return;
+
 	if (!m_pTexture)
 		m_pTexture = GetGameObject()->GetComponent<Texture2DComponent>();
 
 	m_pTexture->SetTexture("QBert/Sprites.png");
 	m_pTexture->SetTextureOffset(m_TextureOffset);
 	m_pTexture->SetTextureSize({ m_TextureSize, m_TextureSize });
+
+	m_IsInitialized = true;
 }
 
 void QBertTile::Render() const
@@ -87,12 +92,15 @@ void QBertTile::SetState(TileState state)
 	}
 }
 
-void QBertTile::EnterCharacter(QBertCharacter* pNewCharacter)
+bool QBertTile::EnterCharacter(QBertCharacter* pNewCharacter)
 {
 	if (!m_pCurrentCharacter)
+	{
 		m_pCurrentCharacter = pNewCharacter;
+		return true;
+	}
 	else
-		EvaluateCharacterConflict(pNewCharacter);
+		return EvaluateCharacterConflict(pNewCharacter);
 }
 
 void QBertTile::LeaveCharacter()
@@ -100,12 +108,12 @@ void QBertTile::LeaveCharacter()
 	m_pCurrentCharacter = nullptr;
 }
 
-void QBertTile::EvaluateCharacterConflict(QBertCharacter* pNewCharacter)
+bool QBertTile::EvaluateCharacterConflict(QBertCharacter* pNewCharacter)
 {
 	if (!m_pCurrentCharacter)
 	{
 		m_pCurrentCharacter = pNewCharacter;
-		return;
+		return true;
 	}
 
 	const QBertCharacterType currentType = m_pCurrentCharacter->GetType();
@@ -120,15 +128,18 @@ void QBertTile::EvaluateCharacterConflict(QBertCharacter* pNewCharacter)
 			case QBertCharacterType::Coily:
 			case QBertCharacterType::UggWrongway:
 			{
+				//kill QBertPlayer
 				m_pCurrentCharacter->Kill(false);
+				//replace tile's current character (qbert) with enemy
 				m_pCurrentCharacter = pNewCharacter;
-				break;
+				return true;
 			}
 			case QBertCharacterType::GreenBall:
 			case QBertCharacterType::SlickSam:
 			{
+				//kill slicksam jumping on QBertPlayer
 				pNewCharacter->Kill(false);
-				break;
+				return false;
 			}
 		}
 	break;
@@ -139,7 +150,9 @@ void QBertTile::EvaluateCharacterConflict(QBertCharacter* pNewCharacter)
 	{
 		if (newType == QBertCharacterType::QBert)
 		{
+			//kill QBertPlayer jumping on enemy
 			pNewCharacter->Kill(false);
+			return true;
 		}
 		break;
 	}
@@ -148,10 +161,14 @@ void QBertTile::EvaluateCharacterConflict(QBertCharacter* pNewCharacter)
 	{
 		if (newType == QBertCharacterType::QBert)
 		{
+			//kill greenball/slicksam
 			m_pCurrentCharacter->Kill(false);
+			//replace with QBertPlayer
 			m_pCurrentCharacter = pNewCharacter;
+			return true;
 		}
 		break;
 	}
 	}
+	return false;
 }

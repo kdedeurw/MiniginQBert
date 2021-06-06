@@ -21,7 +21,7 @@ public:
 	TransformComponent& operator=(const TransformComponent& other) = default;
 	TransformComponent& operator=(TransformComponent&& other) = default;
 
-	void Initialize() override;
+	void Initialize(bool forceInitialize = false) override;
 	void Render() const override;
 	void Update() override;
 

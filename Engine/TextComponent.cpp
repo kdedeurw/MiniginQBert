@@ -3,14 +3,15 @@
 #include <SDL_ttf.h>
 
 #include "Font.h"
-#include "Texture2D.h"
+#include "Texture.h"
 
 TextComponent::TextComponent()
 	: Component{}
 	, m_NeedsUpdate{ true }
 	, m_Text{ "Sample Text" }
 	, m_pFont{ ResourceManager::GetInstance().LoadFont("Lingua.otf", 24) }
-	, m_pTextureData{ GlobalMemoryPools::GetInstance().CreateTexture2D(nullptr) } //get memory address, this will be overwritten at will
+	//, m_pTextureData{ GlobalMemoryPools::GetInstance().CreateTexture2D(nullptr) } //get memory address, this will be overwritten at will
+	, m_pTextureData{ new Texture{} } //get memory address, this will be overwritten at will (DEPRECATED ATM)
 	, m_Colour{}
 {}
 
@@ -21,16 +22,22 @@ TextComponent::~TextComponent()
 	m_pTextureData = nullptr;
 }
 
-void TextComponent::Initialize()
+void TextComponent::Initialize(bool forceInitialize)
 {
+	if (!forceInitialize && m_IsInitialized)
+		return;
+
 	Update();
+
+	m_IsInitialized = true;
 }
 
 void TextComponent::Update()
 {
 	if (m_NeedsUpdate)
 	{
-		SDL_DestroyTexture(m_pTextureData->GetSDLTexture()); //destroy old texture before losing pointer
+		//SDL_DestroyTexture(m_pTextureData->GetSDLTexture()); //destroy old texture before losing pointer
+		delete m_pTextureData;
 		SDL_Surface* pSurface = TTF_RenderText_Blended(m_pFont->GetFont(), m_Text.c_str(), 
 			SDL_Color{ m_Colour.r, m_Colour.g, m_Colour.b, m_Colour.a });
 		if (pSurface == nullptr) 
@@ -43,7 +50,8 @@ void TextComponent::Update()
 			throw std::runtime_error(std::string("Create text texture from surface failed: ") + SDL_GetError());
 		}
 		SDL_FreeSurface(pSurface);
-		m_pTextureData = ReplenishTextureData(pTexture);
+		//m_pTextureData = ReplenishTextureData(pTexture);
+		m_pTextureData = new Texture{ pTexture };
 		m_NeedsUpdate = false;
 	}
 }

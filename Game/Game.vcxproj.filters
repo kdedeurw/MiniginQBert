@@ -1,19 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="Header Files\Events">
-      <UniqueIdentifier>{52890c06-7654-40b8-aa2f-a0c1a02c8d49}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Physics">
-      <UniqueIdentifier>{5ceb472a-bb1f-4031-8116-af84ae331bc0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game Files">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
@@ -22,23 +12,20 @@
     <Filter Include="Base">
       <UniqueIdentifier>{581d3fd3-4321-4c83-97b4-09241817c2fa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="QBert">
+    <Filter Include="Game Files\QBert">
       <UniqueIdentifier>{525ea76b-c860-4530-abee-e51620cd3551}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game Files\QBert\Characters">
+      <UniqueIdentifier>{760223d7-db04-4e34-85e8-66ce8713fa2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game Files\QBert\Level">
+      <UniqueIdentifier>{a2fdfc45-e80a-4d3f-ad0c-5f0e546e2e82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game Files\QBert\Events">
+      <UniqueIdentifier>{1673a013-dc1a-4ddc-b73b-e1803dc18104}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CharacterController.cpp">
-      <Filter>Game Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MovementComponent.cpp">
-      <Filter>Game Files</Filter>
-    </ClCompile>
-    <ClCompile Include="QBertGameObserver.cpp">
-      <Filter>QBert</Filter>
-    </ClCompile>
-    <ClCompile Include="QBertPlayer.cpp">
-      <Filter>QBert</Filter>
-    </ClCompile>
     <ClCompile Include="Main.cpp">
       <Filter>Base</Filter>
     </ClCompile>
@@ -51,44 +38,44 @@
     <ClCompile Include="SoundTester.cpp">
       <Filter>Game Files</Filter>
     </ClCompile>
-    <ClCompile Include="QBertLevel.cpp">
-      <Filter>QBert</Filter>
+    <ClCompile Include="QBertGameObserver.cpp">
+      <Filter>Game Files\QBert\Events</Filter>
     </ClCompile>
-    <ClCompile Include="QBertTile.cpp">
-      <Filter>QBert</Filter>
+    <ClCompile Include="QBertLevel.cpp">
+      <Filter>Game Files\QBert\Level</Filter>
     </ClCompile>
     <ClCompile Include="QBertLevelReader.cpp">
-      <Filter>QBert</Filter>
+      <Filter>Game Files\QBert\Level</Filter>
     </ClCompile>
-    <ClCompile Include="QBertGame.cpp">
-      <Filter>QBert</Filter>
+    <ClCompile Include="QBertTile.cpp">
+      <Filter>Game Files\QBert\Level</Filter>
     </ClCompile>
     <ClCompile Include="QBertCharacter.cpp">
-      <Filter>QBert</Filter>
+      <Filter>Game Files\QBert\Characters</Filter>
     </ClCompile>
     <ClCompile Include="QBertCharacterMovement.cpp">
-      <Filter>QBert</Filter>
+      <Filter>Game Files\QBert\Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="QBertPlayer.cpp">
+      <Filter>Game Files\QBert\Characters</Filter>
     </ClCompile>
     <ClCompile Include="QBertRedBall.cpp">
-      <Filter>QBert</Filter>
+      <Filter>Game Files\QBert\Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="QBertGame.cpp">
+      <Filter>Game Files\QBert</Filter>
+    </ClCompile>
+    <ClCompile Include="QBertCoily.cpp">
+      <Filter>Game Files\QBert\Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="QBertSlickSam.cpp">
+      <Filter>Game Files\QBert\Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="QBertSpinningDisk.cpp">
+      <Filter>Game Files\QBert\Level</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CharacterController.h">
-      <Filter>Game Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MovementComponent.h">
-      <Filter>Game Files</Filter>
-    </ClInclude>
-    <ClInclude Include="QBertGameObserver.h">
-      <Filter>QBert</Filter>
-    </ClInclude>
-    <ClInclude Include="QBertEvents.h">
-      <Filter>QBert</Filter>
-    </ClInclude>
-    <ClInclude Include="QBertPlayer.h">
-      <Filter>QBert</Filter>
-    </ClInclude>
     <ClInclude Include="catch.hpp">
       <Filter>Base</Filter>
     </ClInclude>
@@ -101,26 +88,44 @@
     <ClInclude Include="SoundTester.h">
       <Filter>Game Files</Filter>
     </ClInclude>
-    <ClInclude Include="QBertLevel.h">
-      <Filter>QBert</Filter>
+    <ClInclude Include="QBertEvents.h">
+      <Filter>Game Files\QBert\Events</Filter>
     </ClInclude>
-    <ClInclude Include="QBertTile.h">
-      <Filter>QBert</Filter>
+    <ClInclude Include="QBertGameObserver.h">
+      <Filter>Game Files\QBert\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="QBertLevel.h">
+      <Filter>Game Files\QBert\Level</Filter>
     </ClInclude>
     <ClInclude Include="QBertLevelReader.h">
-      <Filter>QBert</Filter>
+      <Filter>Game Files\QBert\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="QBertTile.h">
+      <Filter>Game Files\QBert\Level</Filter>
     </ClInclude>
     <ClInclude Include="QBertCharacter.h">
-      <Filter>QBert</Filter>
-    </ClInclude>
-    <ClInclude Include="QBertGame.h">
-      <Filter>QBert</Filter>
+      <Filter>Game Files\QBert\Characters</Filter>
     </ClInclude>
     <ClInclude Include="QBertCharacterMovement.h">
-      <Filter>QBert</Filter>
+      <Filter>Game Files\QBert\Characters</Filter>
+    </ClInclude>
+    <ClInclude Include="QBertPlayer.h">
+      <Filter>Game Files\QBert\Characters</Filter>
     </ClInclude>
     <ClInclude Include="QBertRedBall.h">
-      <Filter>QBert</Filter>
+      <Filter>Game Files\QBert\Characters</Filter>
+    </ClInclude>
+    <ClInclude Include="QBertGame.h">
+      <Filter>Game Files\QBert</Filter>
+    </ClInclude>
+    <ClInclude Include="QBertCoily.h">
+      <Filter>Game Files\QBert\Characters</Filter>
+    </ClInclude>
+    <ClInclude Include="QBertSlickSam.h">
+      <Filter>Game Files\QBert\Characters</Filter>
+    </ClInclude>
+    <ClInclude Include="QBertSpinningDisk.h">
+      <Filter>Game Files\QBert\Level</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

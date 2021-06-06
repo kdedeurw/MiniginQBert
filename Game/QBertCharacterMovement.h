@@ -20,7 +20,7 @@ public:
 	QBertCharacterMovement();
 	virtual ~QBertCharacterMovement();
 
-	virtual void Initialize() override;
+	virtual void Initialize(bool forceInitialize = false) override;
 	virtual void Render() const override {};
 	virtual void Update() override;
 

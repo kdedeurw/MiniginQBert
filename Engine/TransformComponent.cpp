@@ -8,10 +8,12 @@ TransformComponent::TransformComponent()
 {
 }
 
-void TransformComponent::Initialize()
+void TransformComponent::Initialize(bool)
 {
 	m_TransformChanges = 7; //all bitmasks
 	Update();
+
+	m_IsInitialized = true;
 }
 
 void TransformComponent::Render() const

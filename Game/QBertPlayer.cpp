@@ -20,24 +20,31 @@ QBertPlayer::~QBertPlayer()
 {
 }
 
-void QBertPlayer::Initialize()
+void QBertPlayer::Initialize(bool forceInitialize)
 {
+	if (!forceInitialize && m_IsInitialized)
+		return;
+
 	QBertCharacter::Initialize();
 
 	//init chain is not in right order
 	//GetMovement()->AssignCharacter(this);
 
 	if (!m_pTexture)
+	{
 		m_pTexture = GetGameObject()->GetComponent<Texture2DComponent>();
 
-	m_pTexture->SetTexture("QBert/Sprites.png");
-	m_pTexture->SetTextureSize({ m_TextureSize, m_TextureSize });
-	m_pTexture->SetTextureOffset({m_TextureSize * 6, 0.f});
+		m_pTexture->SetTexture("QBert/Sprites.png");
+		m_pTexture->SetTextureSize({ m_TextureSize, m_TextureSize });
+		m_pTexture->SetTextureOffset({ m_TextureSize * 6, 0.f });
+	}
 
 	//translate sprite above cube
 	TransformComponent& trans = GetGameObject()->GetTransform();
 	Vector4& dstRct = m_pTexture->GetTexture2D()->GetDestRect();
-	dstRct.y += m_TextureSize * trans.GetWorld().Scale.y;
+	dstRct.y = m_TextureSize * trans.GetWorld().Scale.y;
+
+	m_IsInitialized = true;
 }
 
 void QBertPlayer::Render() const
@@ -49,10 +56,11 @@ void QBertPlayer::Update()
 	HandleInput();
 }
 
-void QBertPlayer::Respawn()
+void QBertPlayer::Respawn(bool hasFallen)
 {
-	GetLevel()->ClearAllEnemies();
-	GetMovement()->SetToTile(GetLevel()->GetUpperTile());
+	GetLevel()->QueueEvent(this, GameEvent::kill_all_enemies);
+	if (hasFallen)
+		GetMovement()->SetToTile(GetLevel()->GetUpperTile());
 	m_IsKilled = false;
 }
 
@@ -108,6 +116,5 @@ void QBertPlayer::Kill(bool hasFallen)
 
 	//TODO: add respawn delay
 
-	if (hasFallen)
-		Respawn();
+	Respawn(hasFallen);
 }

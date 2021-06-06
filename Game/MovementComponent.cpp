@@ -14,7 +14,7 @@ MovementComponent::~MovementComponent()
 {
 }
 
-void MovementComponent::Initialize()
+void MovementComponent::Initialize(bool)
 {
 }
 

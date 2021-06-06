@@ -8,6 +8,7 @@ struct SDL_Window;
 struct SDL_Renderer;
 struct SDL_Texture;
 class Camera;
+class Font;
 class Renderer final : public SingletonRef<Renderer>
 {
 public:

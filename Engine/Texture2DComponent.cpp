@@ -7,38 +7,46 @@
 #include "TransformComponent.h"
 #include "Math2D.h"
 #include "GameObject.h"
-#include "GlobalMemoryPools.h"
+//#include "GlobalMemoryPools.h"
 
 Texture2DComponent::Texture2DComponent()
-	: m_pTexture{ GlobalMemoryPools::GetInstance().CreateTexture2D(nullptr) }
+	//: m_pTexture{ GlobalMemoryPools::GetInstance().CreateTexture2D(nullptr) }
+	: m_pTexture{ new Texture2D{} }
 	, m_Pivot{ 0.5f, 0.5f }
 {}
 
 Texture2DComponent::~Texture2DComponent()
 {
+	if (m_pTexture)
+		delete m_pTexture;
 	m_pTexture = nullptr;
 }
 
-void Texture2DComponent::Initialize()
+void Texture2DComponent::Initialize(bool forceInitialize)
 {
+	if (!forceInitialize && m_IsInitialized)
+		return;
+
 	//if (!m_pTexture->InitializeTexture())
 	//	throw std::exception("Texture2DComponent::Initialize > invalid texture or texture not set");
 	//resets dest- and sourcerects;
+
+	m_IsInitialized = true;
 }
 
 void Texture2DComponent::Render() const
 {
+#ifdef _DEBUG
+	if (!m_pTexture->GetSDLTexture())
+		throw std::exception{ "Texture2DComponent::Render > No Texture assigned!" };
+#endif
+
 	const Transform& worldTrans = GetGameObject()->GetTransform().GetWorld();
 	const Vector2& pos = worldTrans.Position;
 	const Vector2& scale = worldTrans.Scale;
 	const Vector4& dstRect = m_pTexture->GetDestRect();
 	const Vector4& srcRect = m_pTexture->GetSourceRect();
 	Renderer::GetInstance().RenderTexture(m_pTexture->GetSDLTexture(), pos, dstRect, srcRect, scale, worldTrans.Rotation, m_Pivot, m_pTexture->GetFlip() );
-}
-
-void Texture2DComponent::SetTexture(SDL_Texture* pTexture)
-{
-	m_pTexture->SetTexture(pTexture);
 }
 
 void Texture2DComponent::SetTexture(const std::string& fileAsset)

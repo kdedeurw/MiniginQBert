@@ -12,15 +12,14 @@
 //#pragma comment(lib, "Engine.lib")
 //>already defined in additional dependencies
 
-//postbuild event
-//xcopy / y / d  "$(SolutionDir)3rdParty\SDL2\lib\x86\SDL2.dll" "$(TargetDir)"
-
 #include "SceneManager.h"
-#include "GlobalMemoryPools.h"
+//#include "GlobalMemoryPools.h"
 #include "Renderer.h"
 #include "ResourceManager.h"
 
 #include "InputManager.h"
+#include "Observer.h"
+#include "Subject.h"
 
 #include "Vectors.h"
 #include "Math2D.h"

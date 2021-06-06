@@ -10,13 +10,14 @@ enum class TileState
 
 class QBertCharacter;
 class Texture2DComponent;
+class Subject;
 class QBertTile final : public Component
 {
 public:
 	QBertTile();
 	~QBertTile();
 
-	virtual void Initialize() override;
+	virtual void Initialize(bool forceInitialize = false) override;
 	virtual void Render() const override;
 	virtual void Update() override;
 
@@ -26,7 +27,8 @@ public:
 	void SetState(TileState state);
 
 	QBertCharacter* GetCurrentCharacter() const { return m_pCurrentCharacter; }
-	void EnterCharacter(QBertCharacter* pNewCharacter);
+	//Did the character also enter the tile or get killed?
+	bool EnterCharacter(QBertCharacter* pNewCharacter);
 	void LeaveCharacter();
 
 	Subject* GetSubject() const { return m_pSubject; }
@@ -54,7 +56,7 @@ private:
 	Subject* m_pSubject;
 	Neighbours m_Neighbours;
 
-	void EvaluateCharacterConflict(QBertCharacter* pNewCharacter);
+	bool EvaluateCharacterConflict(QBertCharacter* pNewCharacter);
 
 	static int m_TextureId;
 	static const float m_TextureSize;

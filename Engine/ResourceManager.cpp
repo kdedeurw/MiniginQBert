@@ -9,7 +9,15 @@
 
 ResourceManager::~ResourceManager()
 {
+	for (const auto it : m_Textures)
+	{
+		delete it.second;
+	}
 	m_Textures.clear();
+	for (const auto it : m_Fonts)
+	{
+		delete it.second;
+	}
 	m_Fonts.clear();
 
 	//wrong order of execution between cleanup of core and resourcemanager
@@ -40,7 +48,7 @@ void ResourceManager::Init(const std::string& dataPath)
 	}
 }
 
-SDL_Texture* ResourceManager::LoadTexture(const std::string& file)
+Texture* ResourceManager::LoadTexture(const std::string& file)
 {
 	//search whether the texture already exists
 	const auto it = m_Textures.find(file);
@@ -54,7 +62,7 @@ SDL_Texture* ResourceManager::LoadTexture(const std::string& file)
 	{
 		throw std::runtime_error(std::string("Failed to load texture: ") + SDL_GetError());
 	}
-	return m_Textures[file] = pTexture;
+	return m_Textures[file] = new Texture{ pTexture };
 }
 
 Font* ResourceManager::LoadFont(const std::string& file, unsigned int size)
@@ -75,11 +83,12 @@ Font* ResourceManager::LoadFont(const std::string& file, unsigned int size)
 			if (itSize != m_Fonts.end())
 				return it->second;
 			//or simply create new one
-			return m_Fonts[newName] = GlobalMemoryPools::GetInstance().CreateOwnFont(m_DataPath + file, size);
+			//return m_Fonts[newName] = GlobalMemoryPools::GetInstance().CreateOwnFont(m_DataPath + file, size);
+			return m_Fonts[newName] = new Font{ m_DataPath + file, size };
 		}
 	}
 	//if not, create new font
-	return m_Fonts[file] = GlobalMemoryPools::GetInstance().CreateOwnFont(m_DataPath + file, size);
+	return m_Fonts[file] = new Font{ m_DataPath + file, size };
 }
 
 const std::string& ResourceManager::GetDataPath() const

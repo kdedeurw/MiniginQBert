@@ -13,7 +13,8 @@ FPSComponent::FPSComponent()
 	, m_Text{ "" }
 	, m_ElapsedSec{}
 	, m_NeedsUpdate{ true } //do not set this to false to start off, bc the Render function will crash bc invalid pTextureData
-	, m_pTextureData{ GlobalMemoryPools::GetInstance().CreateTexture2D(nullptr) } //get memory address, this will be overwritten at will
+	//, m_pTextureData{ GlobalMemoryPools::GetInstance().CreateTexture2D(nullptr) } //get memory address, this will be overwritten at will
+	, m_pTextureData{ new Texture2D{} }
 {
 	ResetFPS();
 }

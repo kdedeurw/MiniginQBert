@@ -1,5 +1,14 @@
 #pragma once
 #include "Component.h"
+#include <queue>
+
+enum class GameEvent
+{
+	kill_enemy,
+	kill_all_enemies,
+	kill_player,
+	kill_all_players,
+};
 
 class QBertTile;
 class QBertCharacter;
@@ -10,29 +19,25 @@ enum class TileState : int;
 enum class QBertCharacterType : int;
 class QBertLevel final : public Component
 {
-	enum class TileAlteration
-	{
-		None,
-		Next,
-		Previous,
-	};
 public:
 	QBertLevel();
 	~QBertLevel();
 
-	void Initialize() override;
+	void Initialize(bool forceInitialize = false) override;
 	void Render() const override {};
 	void PostRender() const override;
 	void Update() override;
 
-	void ResetTiles();
-	void RemoveEnemy(QBertCharacter* pEnemy);
-	void ClearAllEnemies();
-
+	void QueueEvent(QBertCharacter* pCharacter, GameEvent event);
+	void ResetAllTiles();
 	void MoveOnTile(QBertCharacter* pCharacter, int tileId);
+
+	int GetAmountOfTiles() const { return m_AmountOfTiles; }
+	int GetLowerRowSize() const { return m_LowerRowSize; }
 	QBertTile* GetTile(int tileId) const;
-	QBertTile* GetUpperTile() const { return m_pTiles[m_AmountOfTiles - 1]; };
+	QBertTile* GetUpperTile() const { return m_pTiles[m_AmountOfTiles - 1]; }
 	QBertTile* GetLastTowTile() const { return m_pTiles[m_LowerRowSize - 1]; }
+	const std::vector<QBertPlayer*>& GetPlayers() const { return m_pPlayers; }
 
 private:
 	short m_CurrRound, m_CurrLevel, m_CurrentTargetTiles;
@@ -44,20 +49,34 @@ private:
 	float m_CurrentEnemySpawnDelay;
 	const float m_EnemySpawnDelay = 1.f;
 	QBertGameObserver* m_pObserver;
-	//TODO: vector of players
-	QBertPlayer* m_pPlayer;
+	const std::vector<QBertLevelData>& m_LevelDatas;
+	std::vector<QBertPlayer*> m_pPlayers;
 	std::vector<QBertTile*> m_pTiles;
 	std::vector<QBertCharacter*> m_pEnemies;
-	const std::vector<QBertLevelData>& m_LevelDatas;
 
+	struct GameEventRequest
+	{
+		GameEvent Event;
+		QBertCharacter* pCharacter;
+	};
+	std::queue<GameEventRequest> m_Events;
+
+	//Handlers
+	void HandleGameEvents();
+	void HandleEnemySpawning();
+
+	//Cleaners
+	void RemoveEnemy(QBertCharacter* pEnemy);
+	void ClearAllEnemies();
+	void ClearAllPlayers();
+
+	//Fabricators
 	GameObject* CreateTile();
 	GameObject* CreatePlayer();
 	GameObject* CreateEnemy(char type);
 	GameObject* CreateSpinningDisk();
 
-	TileAlteration GetCharacterTileAlteration(QBertCharacterType type);
-
-	void HandleEnemySpawning();
+	//Helpers
 	TileState EvaluateNextState(TileState state);
 	TileState EvaluatePreviousState(TileState state);
 	void CommenceNextRound();
@@ -66,6 +85,7 @@ private:
 	bool OnLevelWin();
 	void OnGameWin();
 
+	//Tile Helpers
 	void ConnectTiles();
 	int GetLowerRowMin(int currRowSize) const;
 	int GetLowerRowMax(int currRowSize) const;

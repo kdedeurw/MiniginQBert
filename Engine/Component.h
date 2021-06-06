@@ -9,7 +9,8 @@ class Component
 {
 public:
 	Component()
-		: m_pGameObject{}
+		: m_IsInitialized{}
+		, m_pGameObject{}
 	{}
 	virtual ~Component() noexcept
 	{
@@ -20,7 +21,7 @@ public:
 	Component& operator=(const Component& other) = delete;
 	Component& operator=(Component&& other) = delete;
 
-	virtual void Initialize() = 0;
+	virtual void Initialize(bool forceInitialize = false) = 0;
 	virtual void PostInitialize() {};
 	virtual void Render() const = 0;
 	virtual void PostRender() const {};
@@ -28,6 +29,9 @@ public:
 	virtual void PostUpdate() {};
 
 	GameObject* GetGameObject() const { return m_pGameObject; }
+
+protected:
+	bool m_IsInitialized;
 
 private:
 	friend class GameObject;

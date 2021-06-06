@@ -11,6 +11,13 @@ enum class QBertCharacterType
 	SlickSam,
 };
 
+enum class QBertTileAlteration
+{
+	None,
+	Next,
+	Previous,
+};
+
 class QBertLevel;
 class Subject;
 class QBertCharacterMovement;
@@ -20,7 +27,7 @@ public:
 	QBertCharacter();
 	virtual ~QBertCharacter();
 	
-	virtual void Initialize() override;
+	virtual void Initialize(bool forceInitialize = false) override;
 
 	virtual void Kill(bool hasFallen) = 0;
 
@@ -28,6 +35,7 @@ public:
 	QBertCharacterMovement* GetMovement() const { return m_pMovement; }
 	Subject* GetSubject() const { return m_pSubject; }
 	virtual const QBertCharacterType GetType() const = 0;
+	virtual const QBertTileAlteration GetTileAlteration() const { return QBertTileAlteration::None; }
 
 protected:
 	friend class QBertCharacterMovement;

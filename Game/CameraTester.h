@@ -5,7 +5,7 @@ class CameraTester : public Component
 {
 public:
 
-	virtual void Initialize() override {};
+	virtual void Initialize(bool) override {};
 	virtual void Update() override;
 	virtual void Render() const override;
 

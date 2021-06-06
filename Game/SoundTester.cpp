@@ -16,8 +16,11 @@ SoundTester::~SoundTester()
 	m_pSoundSystem = nullptr;
 }
 
-void SoundTester::Initialize()
+void SoundTester::Initialize(bool forceInitialize)
 {
+	if (!forceInitialize && m_IsInitialized)
+		return;
+
 	if (!m_pSoundSystem)
 		m_pSoundSystem = ServiceLocator::GetSoundSystem(m_IsDebugSound);
 
@@ -26,6 +29,8 @@ void SoundTester::Initialize()
 
 	if (m_SoundId == UINT32_MAX)
 		std::cout << "Sound creation failed!\n";
+
+	m_IsInitialized = true;
 }
 
 void SoundTester::Update()

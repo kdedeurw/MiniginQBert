@@ -6,28 +6,38 @@
 #include "QBertLevelReader.h"
 #include "QBertCharacterMovement.h"
 #include "QBertRedBall.h"
+#include "QBertCoily.h"
+#include "QBertSlickSam.h"
 
 QBertLevel::QBertLevel()
-	: m_CurrRound{}
-	, m_CurrLevel{}
+	: m_CurrRound{ 1 }
+	, m_CurrLevel{ 2 }
 	, m_CurrentTargetTiles{}
 	, m_CurrentEnemySpawnDelay{}
 	, m_CurrentEnemyId{}
 	, m_pObserver{}
 	, m_pTiles{}
-	, m_pPlayer{}
+	, m_pEnemies{}
+	, m_pPlayers{}
 	, m_LevelDatas{ QBertLevelReader::GetLevelData("../Resources/QBertLevels.json") }
 {
 	m_pTiles.reserve(28);
 	m_pEnemies.reserve(10);
+	m_pPlayers.reserve(2);
 }
 
 QBertLevel::~QBertLevel()
 {
+	if (m_pObserver)
+		delete m_pObserver;
+	m_pObserver = nullptr;
 }
 
-void QBertLevel::Initialize()
+void QBertLevel::Initialize(bool forceInitialize)
 {
+	if (!forceInitialize && m_IsInitialized)
+		return;
+
 	//TODO: find workaround
 	QBertCharacter::m_pLevel = this;
 
@@ -35,7 +45,7 @@ void QBertLevel::Initialize()
 
 	m_CurrentEnemySpawnDelay = m_EnemySpawnDelay;
 
-	m_pObserver = GlobalMemoryPools::GetInstance().CreateOnStack<QBertGameObserver>();
+	m_pObserver = new QBertGameObserver{};
 
 	const float tileSize = QBertTile::GetTextureSize();
 	const Vector2& scale = GetGameObject()->GetTransform().GetWorld().Scale;
@@ -52,7 +62,6 @@ void QBertLevel::Initialize()
 			pTile->GetTransform().SetPosition((tileSize * i + totalX) * scale.x, (tileSize + tileSize * j + totalY) * scale.y);
 
 			GetGameObject()->AddChildObject(pTile);
-			pTile->Initialize();
 		}
 		totalY -= tileSize / 4;
 		totalX += tileSize / 2;
@@ -63,7 +72,11 @@ void QBertLevel::Initialize()
 
 	GameObject* pPlayer = CreatePlayer();
 	GetGameObject()->AddChildObject(pPlayer);
-	pPlayer->Initialize();
+	QBertCharacterMovement* pMovement = pPlayer->GetComponent<QBertCharacterMovement>();
+	//TODO: fix for coop/versus
+	pMovement->SetToTile(GetUpperTile());
+
+	m_IsInitialized = true;
 }
 
 void QBertLevel::PostRender() const
@@ -107,32 +120,75 @@ void QBertLevel::PostRender() const
 
 void QBertLevel::Update()
 {
+	HandleGameEvents();
+
 	HandleEnemySpawning();
+}
+
+void QBertLevel::HandleGameEvents()
+{
+	while (!m_Events.empty())
+	{
+		const GameEventRequest& req = m_Events.front();
+		switch (req.Event)
+		{
+		case GameEvent::kill_enemy:
+			RemoveEnemy(req.pCharacter);
+			break;
+		case GameEvent::kill_all_enemies:
+			ClearAllEnemies();
+			break;
+		case GameEvent::kill_player:
+			break;
+		case GameEvent::kill_all_players:
+			ClearAllPlayers();
+			break;
+		}
+		m_Events.pop();
+	}
 }
 
 void QBertLevel::ClearAllEnemies()
 {
 	for (QBertCharacter* pEnemy : m_pEnemies)
 	{
-		GetGameObject()->RemoveChildObject(pEnemy->GetGameObject(), true);
+		GetGameObject()->RemoveChildObject(pEnemy->GetGameObject());
+		GetGameObject()->GetScene().RemoveGameObject(pEnemy->GetGameObject());
 	}
 	m_pEnemies.clear();
+	for (QBertTile* pTile : m_pTiles)
+	{
+		pTile->LeaveCharacter();
+	}
+}
+
+void QBertLevel::ClearAllPlayers()
+{
+	for (QBertPlayer* pPlayer : m_pPlayers)
+	{
+		pPlayer->GetMovement()->GetCurrentTile()->LeaveCharacter();
+		GetGameObject()->RemoveChildObject(pPlayer->GetGameObject());
+		GetGameObject()->GetScene().RemoveGameObject(pPlayer->GetGameObject());
+	}
+	m_pPlayers.clear();
 }
 
 void QBertLevel::MoveOnTile(QBertCharacter* pCharacter, int tileId)
 {
 	QBertTile* pTile = GetTile(tileId);
-	pTile->EnterCharacter(pCharacter);
-
-	const TileState state = pTile->GetState();
-	const TileAlteration tileAlteration = GetCharacterTileAlteration(pTile->GetCurrentCharacter()->GetType());
-	if (tileAlteration == TileAlteration::Next)
+	if (pTile->EnterCharacter(pCharacter))
 	{
-		pTile->SetState(EvaluateNextState(state));
-	}
-	else if (tileAlteration == TileAlteration::Previous)
-	{
-		pTile->SetState(EvaluatePreviousState(state));
+		switch (pCharacter->GetTileAlteration())
+		{
+		case::QBertTileAlteration::None:
+			break;
+		case::QBertTileAlteration::Next:
+			pTile->SetState(EvaluateNextState(pTile->GetState()));
+			break;
+		case::QBertTileAlteration::Previous:
+			pTile->SetState(EvaluatePreviousState(pTile->GetState()));
+			break;
+		}
 	}
 
 	if (m_CurrentTargetTiles == m_AmountOfTiles)
@@ -145,7 +201,15 @@ QBertTile* QBertLevel::GetTile(int tileId) const
 	return m_pTiles[tileId];
 }
 
-void QBertLevel::ResetTiles()
+void QBertLevel::QueueEvent(QBertCharacter* pCharacter, GameEvent event)
+{
+	GameEventRequest req;
+	req.Event = event;
+	req.pCharacter = pCharacter;
+	m_Events.push(std::move(req));
+}
+
+void QBertLevel::ResetAllTiles()
 {
 	m_CurrentTargetTiles = 0;
 	QBertTile::m_TextureId = m_CurrLevel + m_CurrRound;
@@ -158,6 +222,8 @@ void QBertLevel::RemoveEnemy(QBertCharacter* pEnemy)
 	const auto it = std::find(m_pEnemies.begin(), m_pEnemies.end(), pEnemy);
 	if (it != m_pEnemies.end())
 	{
+		pEnemy->GetMovement()->GetCurrentTile()->LeaveCharacter();
+
 		m_pEnemies.erase(it);
 		//TODO: what a mess
 		GetGameObject()->RemoveChildObject(pEnemy->GetGameObject());
@@ -238,7 +304,7 @@ TileState QBertLevel::EvaluatePreviousState(TileState state)
 
 void QBertLevel::HandleEnemySpawning()
 {
-	if (m_pEnemies.size() == 3)
+	if (m_pEnemies.size() == 5)
 		return;
 
 	GameState& gs = GameState::GetInstance();
@@ -249,8 +315,15 @@ void QBertLevel::HandleEnemySpawning()
 		const QBertLevelData& levelData = m_LevelDatas[m_CurrLevel];
 		const std::string& enemies = levelData.Rounds[m_CurrRound].Enemies;
 		GameObject* pEnemy = CreateEnemy(enemies[m_CurrentEnemyId]);
-		GetGameObject()->AddChildObject(pEnemy);
-		pEnemy->Initialize();
+		if (pEnemy)
+		{
+			GetGameObject()->AddChildObject(pEnemy);
+
+			QBertCharacterMovement* pMovement = pEnemy->GetComponent<QBertCharacterMovement>();
+			//TODO: invisible spawn tile, no connections???
+			//TODO: spawn on other tiles (rows)
+			pMovement->SetToTile(GetUpperTile());
+		}
 
 		++m_CurrentEnemyId;
 		if (m_CurrentEnemyId >= enemies.size())
@@ -262,32 +335,13 @@ void QBertLevel::HandleEnemySpawning()
 
 void QBertLevel::CommenceNextRound()
 {
-	ResetTiles();
+	ResetAllTiles();
 	ClearAllEnemies();
 
-	m_pPlayer->Respawn();
+	for (QBertPlayer* pPlayer : m_pPlayers)
+		pPlayer->Respawn(true);
 
-	m_CurrentEnemySpawnDelay = m_EnemySpawnDelay;
-}
-
-QBertLevel::TileAlteration QBertLevel::GetCharacterTileAlteration(QBertCharacterType type)
-{
-	switch (type)
-	{
-	case QBertCharacterType::QBert:
-		return TileAlteration::Next;
-
-	case QBertCharacterType::RedBall:
-	case QBertCharacterType::Coily:
-	case QBertCharacterType::UggWrongway:
-	case QBertCharacterType::GreenBall:
-		return TileAlteration::None;
-
-	case QBertCharacterType::SlickSam:
-		return TileAlteration::Previous;
-	}
-
-	return TileAlteration::None;
+	m_CurrentEnemySpawnDelay = m_EnemySpawnDelay * 1.5f;
 }
 
 void QBertLevel::OnRoundWin()
@@ -322,23 +376,24 @@ void QBertLevel::OnGameWin()
 	m_CurrLevel = 0;
 	m_CurrRound = 0;
 
-	ResetTiles();
+	ResetAllTiles();
 	ClearAllEnemies();
 
-	m_pPlayer->Respawn();
+	for (QBertPlayer* pPlayer : m_pPlayers)
+		pPlayer->Respawn(true);
 
 	//TODO: return to main menu
 }
 
 GameObject* QBertLevel::CreateTile()
 {
-	GlobalMemoryPools& gm = GlobalMemoryPools::GetInstance();
+	//GlobalMemoryPools& gm = GlobalMemoryPools::GetInstance();
 	GameObject* pGo = GetGameObject()->GetScene().CreateGameObject();
 
-	Texture2DComponent* pTexture = gm.CreateComponent<Texture2DComponent>();
+	Texture2DComponent* pTexture = new Texture2DComponent{};
 	pGo->AddComponent(pTexture);
 
-	QBertTile* pTile = gm.CreateComponent<QBertTile>();
+	QBertTile* pTile = new QBertTile{};
 	pGo->AddComponent(pTile);
 
 	pTile->GetSubject()->AddObserver(m_pObserver);
@@ -352,74 +407,72 @@ GameObject* QBertLevel::CreateTile()
 
 GameObject* QBertLevel::CreatePlayer()
 {
-	GlobalMemoryPools& gm = GlobalMemoryPools::GetInstance();
+	//GlobalMemoryPools& gm = GlobalMemoryPools::GetInstance();
 	GameObject* pGo = GetGameObject()->GetScene().CreateGameObject();
 
-	Texture2DComponent* pTexture = gm.CreateComponent<Texture2DComponent>();
+	Texture2DComponent* pTexture = new Texture2DComponent{};
 	pGo->AddComponent(pTexture);
 
-	m_pPlayer = gm.CreateComponent<QBertPlayer>();
-
-	pGo->AddComponent(m_pPlayer);
-
-	QBertCharacterMovement* pMovement = gm.CreateComponent<QBertCharacterMovement>();
+	QBertCharacterMovement* pMovement = new QBertCharacterMovement{};
 	pGo->AddComponent(pMovement);
 
-	//TODO: fix for coop/versus
-	pMovement->SetToTile(GetUpperTile());
+	QBertPlayer* pPlayer = new QBertPlayer{};
+	pGo->AddComponent(pPlayer);
 
-	pMovement->AssignCharacter(m_pPlayer);
+	pMovement->AssignCharacter(pPlayer);
 	
-	m_pPlayer->GetSubject()->AddObserver(m_pObserver);
+	pPlayer->GetSubject()->AddObserver(m_pObserver);
+
+	m_pPlayers.push_back(pPlayer);
 
 	return pGo;
 }
 
 GameObject* QBertLevel::CreateEnemy(char type)
 {
-	GlobalMemoryPools& gm = GlobalMemoryPools::GetInstance();
+	//GlobalMemoryPools& gm = GlobalMemoryPools::GetInstance();
 	GameObject* pGo = GetGameObject()->GetScene().CreateGameObject();
 
-	Texture2DComponent* pTexture = gm.CreateComponent<Texture2DComponent>();
-	pGo->AddComponent(pTexture);
-
 	QBertCharacter* pEnemy{};
+	pEnemy = new QBertSlickSam{};
+	type;
+	//switch (type)
+	//{
+	//case 'R':
+	//	pEnemy = new QBertRedBall{};
+	//	break;
+	//case 'C':
+	//	pEnemy = new QBertCoily{};
+	//	break;
+	//case 'U':
+	//	pEnemy = new QBertRedBall{};
+	//	break;
+	//case 'W':
+	//	pEnemy = new QBertRedBall{};
+	//	break;
+	//case 'G':
+	//	pEnemy = new QBertRedBall{};
+	//	break;
+	//case 'S':
+	//	pEnemy = new QBertSlickSam{};
+	//	break;
+	//default:
+	//	std::cout << "Unsupported enemy: \'" << type << "\'\n";
+	//	break;
+	//}
 
-	switch (type)
-	{
-	case 'R':
-		pEnemy = gm.CreateComponent<QBertRedBall>();
-	break;
-	case 'C':
-		pEnemy = gm.CreateComponent<QBertRedBall>();
-		break;
-	case 'U':
-		break;
-	case 'W':
-		break;
-	case 'G':
-		break;
-	case 'S':
-		break;
-	default:
-		std::cout << "Unsupported enemy: \'" << type << "\'\n";
-		break;
-	}
+	SpriteComponent* pSprite = new SpriteComponent{};
+	pGo->AddComponent(pSprite, false);
+
+	QBertCharacterMovement* pMovement = new QBertCharacterMovement{};
+	pGo->AddComponent(pMovement, false);
 
 	m_pEnemies.push_back(pEnemy);
-	pGo->AddComponent(pEnemy);
-
-	QBertCharacterMovement* pMovement = gm.CreateComponent<QBertCharacterMovement>();
-	pGo->AddComponent(pMovement);
+	pGo->AddComponent(pEnemy, false);
 
 	pEnemy->GetSubject()->AddObserver(m_pObserver);
-
+	
 	pMovement->AssignCharacter(pEnemy);
-
-	//TODO: invisible spawn tile, no connections???
-
-	//TODO: spawn on other tiles (rows)
-	pMovement->SetToTile(GetUpperTile());
 
 	return pGo;
 }

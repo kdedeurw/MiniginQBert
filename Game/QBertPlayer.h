@@ -7,17 +7,18 @@ public:
 	QBertPlayer();
 	~QBertPlayer();
 
-	void Initialize() override;
+	void Initialize(bool forceInitialize = false) override;
 	void Render() const override;
 	void Update() override;
 
 	void SetId(PlayerId id) { m_PlayerId = id; }
 	PlayerId GetId() const { return m_PlayerId; }
 	void Kill(bool hasFallen) override;
-	void Respawn();
+	void Respawn(bool hasFallen = true);
 
 	bool IsKilled() const { return m_IsKilled; }
-	const QBertCharacterType GetType() const override { return QBertCharacterType::QBert; };
+	const QBertCharacterType GetType() const override { return QBertCharacterType::QBert; }
+	const QBertTileAlteration GetTileAlteration() const override { return QBertTileAlteration::Next; }
 
 	static float GetTextureSize() { return m_TextureSize; }
 

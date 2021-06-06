@@ -19,10 +19,16 @@ QBertCharacterMovement::~QBertCharacterMovement()
 {
 }
 
-void QBertCharacterMovement::Initialize()
+void QBertCharacterMovement::Initialize(bool forceInitialize)
 {
+	if (!forceInitialize && m_IsInitialized)
+		return;
+
 	if (!m_pCharacter)
 		m_pCharacter = GetGameObject()->GetComponent<QBertCharacter>();
+
+	//TODO: possible base class, remove this when inheriting
+	m_IsInitialized = true;
 }
 
 void QBertCharacterMovement::Update()
@@ -85,24 +91,25 @@ void QBertCharacterMovement::TryMoveTo(MoveDirection moveState)
 
 void QBertCharacterMovement::SetToTile(QBertTile* pTile, bool isMoveOn)
 {
+	m_DesiredPos = pTile->GetGameObject()->GetTransform().GetWorld().Position;
+	TransformComponent& trans = GetGameObject()->GetTransform();
+	trans.SetPosition(m_DesiredPos);
+	m_FormerPos = m_DesiredPos;
+
 	m_IsTryMove = false;
 	if (isMoveOn)
 		LandOnTile(pTile);
+	else
+		pTile->EnterCharacter(m_pCharacter);
+
 	//stop character from stepping on tile
 	m_IsOnTile = true;
 
 	if (m_pCurrentTile)
 		m_pCurrentTile->LeaveCharacter();
 
-	pTile->EnterCharacter(m_pCharacter);
-
 	m_pCurrentTile = pTile;
 	m_CurrentMoveDelay = m_MoveDelay;
-	m_DesiredPos = pTile->GetGameObject()->GetTransform().GetWorld().Position;
-
-	TransformComponent& trans = GetGameObject()->GetTransform();
-	trans.SetPosition(m_DesiredPos);
-	m_FormerPos = m_DesiredPos;
 }
 
 void QBertCharacterMovement::SetToTile(int tileId, bool isMoveOn)

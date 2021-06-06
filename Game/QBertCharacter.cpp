@@ -18,7 +18,7 @@ QBertCharacter::~QBertCharacter()
 	m_pSubject = nullptr;
 }
 
-void QBertCharacter::Initialize()
+void QBertCharacter::Initialize(bool)
 {
 	if (!m_pMovement)
 		m_pMovement = GetGameObject()->GetComponent<QBertCharacterMovement>();

@@ -59,7 +59,7 @@ Scene& SceneManager::CreateUIScene()
 	if (m_pUIScene)
 		return *m_pUIScene;
 
-	m_pUIScene = GlobalMemoryPools::GetInstance().CreateScene("UI");
+	m_pUIScene = new Scene{ "UIScene" };
 	GameState::GetInstance().pUIScene = m_pUIScene;
 
 	return *m_pUIScene;
@@ -67,7 +67,8 @@ Scene& SceneManager::CreateUIScene()
 
 Scene& SceneManager::CreateScene(const std::string& name, bool isActive)
 {
-	Scene* pScene = GlobalMemoryPools::GetInstance().CreateScene(name.c_str());
+	//Scene* pScene = GlobalMemoryPools::GetInstance().CreateScene(name.c_str());
+	Scene* pScene = new Scene{ name };
 	m_pAllScenes.push_back(pScene);
 	if (isActive)
 	{

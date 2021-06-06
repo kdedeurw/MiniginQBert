@@ -22,9 +22,6 @@
     <ClCompile Include="KeyboardMouseListener.cpp">
       <Filter>Base Files\Input\Managers</Filter>
     </ClCompile>
-    <ClCompile Include="GlobalMemoryPools.cpp">
-      <Filter>Core Files\Memory</Filter>
-    </ClCompile>
     <ClCompile Include="Renderer.cpp">
       <Filter>Core Files\Rendering</Filter>
     </ClCompile>
@@ -149,12 +146,6 @@
     <ClInclude Include="KeyboardMouseListener.h">
       <Filter>Base Files\Input\Managers</Filter>
     </ClInclude>
-    <ClInclude Include="GlobalMemoryPools.h">
-      <Filter>Core Files\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="MemoryOverrides.h">
-      <Filter>Core Files\Memory</Filter>
-    </ClInclude>
     <ClInclude Include="RenderFlip.h">
       <Filter>Core Files\Rendering</Filter>
     </ClInclude>
@@ -187,9 +178,6 @@
     </ClInclude>
     <ClInclude Include="Texture2D.h">
       <Filter>Core Files\Resources\Textures</Filter>
-    </ClInclude>
-    <ClInclude Include="Globals.h">
-      <Filter>Base Files\General</Filter>
     </ClInclude>
     <ClInclude Include="GameState.h">
       <Filter>Base Files\General</Filter>

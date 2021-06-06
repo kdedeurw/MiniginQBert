@@ -13,7 +13,7 @@ public:
 	SpriteComponent();
 	virtual ~SpriteComponent();
 
-	virtual void Initialize();
+	virtual void Initialize(bool forceInitialize = false);
 	virtual void Update() override;
 
 	void SetPlayOnce(bool enable);

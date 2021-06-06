@@ -36,9 +36,16 @@ Core::~Core()
 
 void Core::Init()
 {
-	InitializeSDL();
+	try
+	{
+		InitializeSDL();
 
-	ServiceLocator::RegisterSoundSystem(new SoundSystem{});
+		ServiceLocator::RegisterSoundSystem(new SoundSystem{});
+	}
+	catch (std::exception& e)
+	{
+		std::cout << "Core>Init: Exception thrown: " << e.what() << '\n';
+	}
 }
 
 void Core::InitializeSDL()
@@ -118,11 +125,12 @@ void Core::ForceQuit()
 void Core::AddFPSScene(float x, float y) const
 {
 	SceneManager& sm = SceneManager::GetInstance();
-	GlobalMemoryPools& mp = GlobalMemoryPools::GetInstance();
+	//GlobalMemoryPools& mp = GlobalMemoryPools::GetInstance();
 
 	Scene& scene = sm.CreateUIScene();
 	GameObject* pGo = scene.CreateGameObject();
-	FPSComponent* pFPS = mp.CreateComponent<FPSComponent>();
+	//FPSComponent* pFPS = mp.CreateComponent<FPSComponent>();
+	FPSComponent* pFPS = new FPSComponent{};
 	pGo->AddComponent(pFPS);
 	pGo->GetTransform().SetPosition(x, y);
 }
@@ -130,20 +138,21 @@ void Core::AddFPSScene(float x, float y) const
 void Core::AddDemoScene() const
 {
 	Scene& scene = SceneManager::GetInstance().CreateScene("Demo");
-	GlobalMemoryPools& gm = GlobalMemoryPools::GetInstance();
+	//GlobalMemoryPools& gm = GlobalMemoryPools::GetInstance();
 	GameState& gs = GameState::GetInstance();
 	WindowInfo* pWi = gs.pWindowInfo;
 
 	//create background
 	GameObject* pGo = scene.CreateGameObject();
-	Texture2DComponent* pTex = gm.CreateComponent<Texture2DComponent>();
+	//Texture2DComponent* pTex = gm.CreateComponent<Texture2DComponent>();
+	Texture2DComponent* pTex = new Texture2DComponent{};
 	pTex->SetTexture("background.jpg");
 	pGo->AddComponent(pTex);
 	pGo->GetTransform().Translate(pWi->Width / 2.f, pWi->Height / 2.f);
 
 	//create logo
 	pGo = scene.CreateGameObject();
-	pTex = gm.CreateComponent<Texture2DComponent>();
+	pTex = new Texture2DComponent{};
 	pTex->SetTexture("logo.png");
 	pGo->AddComponent(pTex);
 	pGo->GetTransform().Translate(pWi->Width / 2.f, pWi->Height / 2.f);
@@ -151,7 +160,8 @@ void Core::AddDemoScene() const
 	//create text
 	pGo = scene.CreateGameObject();
 	Font* pFont = ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
-	TextComponent* pTc = gm.CreateComponent<TextComponent>();
+	//TextComponent* pTc = gm.CreateComponent<TextComponent>();
+	TextComponent* pTc = new TextComponent{};
 	pTc->SetText("Programming 4 Assignment");
 	pTc->SetFont(pFont);
 	pGo->AddComponent(pTc);
