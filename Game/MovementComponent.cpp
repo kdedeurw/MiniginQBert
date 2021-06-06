@@ -24,7 +24,7 @@ void MovementComponent::Render() const
 
 void MovementComponent::Update()
 {
-	TransformComponent& transform = m_pGameObject->GetTransform();
+	TransformComponent& transform = GetGameObject()->GetTransform();
 	//Vector2& pos = transform.GetPosition();
 
 	const float deltaTime = GameState::GetInstance().DeltaTime;
@@ -72,6 +72,6 @@ void MovementComponent::SetAngularVelocity(float vel)
 
 void MovementComponent::AutoOrient()
 {
-	TransformComponent& transform = m_pGameObject->GetTransform();
+	TransformComponent& transform = GetGameObject()->GetTransform();
 	transform.SetRotation(Math2D::OrientOnWorld(m_CurrentVelocity));
 }

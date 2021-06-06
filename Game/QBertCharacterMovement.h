@@ -1,8 +1,19 @@
 #pragma once
 #include "Component.h"
 
+enum class MoveDirection
+{
+	TopLeft,
+	TopRight,
+	BottomLeft,
+	BottomRight,
+	Left,
+	Right,
+};
+
 class QBertTile;
 class QBertCharacter;
+class QBertLevel;
 class QBertCharacterMovement : public Component
 {
 public:
@@ -13,18 +24,23 @@ public:
 	virtual void Render() const override {};
 	virtual void Update() override;
 
+	virtual void TryMoveTo(MoveDirection moveState);
+
 	virtual void SetToTile(QBertTile* pTile, bool isMoveOn = false);
 	void SetToTile(int tileId, bool isMoveOn = false);
 
 	float GetMoveDelay() const { return m_MoveDelay; }
 	void SetMoveDelay(float moveDelay) { m_MoveDelay = moveDelay; }
 
-	bool IsMoving() const { return m_CurrentMoveDelay > 0.f; }
+	bool IsMoving() const { return m_IsTryMove; }
 	QBertTile* GetCurrentTile() const { return m_pCurrentTile; }
+
+	//Temporary 'fix' BUG: GetComponent<QBertCharacter>() cannot find inherited classes
+	void AssignCharacter(QBertCharacter* pCharacter) { m_pCharacter = pCharacter; }
 
 protected:
 	friend class QBertLevel;
-	bool m_IsOnTile;
+	bool m_IsOnTile, m_IsTryMove;
 	float m_CurrentMoveDelay;
 	float m_MoveDelay = 0.5f;
 	QBertCharacter* m_pCharacter;
@@ -35,4 +51,6 @@ protected:
 	void HandleMove();
 	void LandOnTile(QBertTile* pTile);
 	void LandOnTile(int tileId);
+
+	QBertLevel* GetLevel() const;
 };

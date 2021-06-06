@@ -60,7 +60,7 @@ void FPSComponent::Update()
 
 void FPSComponent::Render() const
 {
-	const Transform& worldTrans = m_pGameObject->GetTransform().GetWorld();
+	const Transform& worldTrans = GetGameObject()->GetTransform().GetWorld();
 	Vector2 pos = worldTrans.Position;
 	const float rot = worldTrans.Rotation;
 	const Vector4& srcRect = m_pTextureData->GetSourceRect();

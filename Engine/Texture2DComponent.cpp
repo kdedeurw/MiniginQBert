@@ -28,7 +28,7 @@ void Texture2DComponent::Initialize()
 
 void Texture2DComponent::Render() const
 {
-	const Transform& worldTrans = m_pGameObject->GetTransform().GetWorld();
+	const Transform& worldTrans = GetGameObject()->GetTransform().GetWorld();
 	const Vector2& pos = worldTrans.Position;
 	const Vector2& scale = worldTrans.Scale;
 	const Vector4& dstRect = m_pTexture->GetDestRect();

@@ -64,7 +64,7 @@ void Core::InitializeSDL()
 	Renderer::GetInstance().Init(m_pWindow);
 }
 
-void Core::Cleanup()
+void Core::Cleanup() noexcept
 {
 	SDL_DestroyWindow(m_pWindow);
 	m_pWindow = nullptr;
@@ -90,18 +90,23 @@ void Core::Run()
 	Renderer& renderer = Renderer::GetInstance();
 	GameState& gs = GameState::GetInstance();
 
-	sm.Initialize();
-
-	Timer<high_resolution_clock> timer{}; //start point automatically resets to Time::Now();
-	while (!m_IsQuit)
+	try
 	{
-		gs.DeltaTime = timer.GetElapsedTimeMs<float>();
-		timer.ResetStartTime();
-		m_IsQuit = ProcessInputs();
-		sm.Update();
-		renderer.Render();
+		sm.Initialize();
+		Timer<high_resolution_clock> timer{}; //start point automatically resets to Time::Now();
+		while (!m_IsQuit)
+		{
+			gs.DeltaTime = timer.GetElapsedTimeMs<float>();
+			timer.ResetStartTime();
+			m_IsQuit = ProcessInputs();
+			sm.Update();
+			renderer.Render();
+		}
 	}
-
+	catch (const std::exception& e)
+	{
+		std::cout << "Exception caught: " << e.what() << '\n';
+	}
 	Cleanup();
 }
 

@@ -6,6 +6,7 @@
 
 QBertCharacterMovement::QBertCharacterMovement()
 	: m_IsOnTile{}
+	, m_IsTryMove{}
 	, m_CurrentMoveDelay{}
 	, m_pCharacter{}
 	, m_pCurrentTile{}
@@ -21,7 +22,7 @@ QBertCharacterMovement::~QBertCharacterMovement()
 void QBertCharacterMovement::Initialize()
 {
 	if (!m_pCharacter)
-		m_pCharacter = m_pGameObject->GetComponent<QBertCharacter>();
+		m_pCharacter = GetGameObject()->GetComponent<QBertCharacter>();
 }
 
 void QBertCharacterMovement::Update()
@@ -29,83 +30,36 @@ void QBertCharacterMovement::Update()
 	HandleMove();
 }
 
-void QBertCharacterMovement::SetToTile(QBertTile* pTile, bool isMoveOn)
+void QBertCharacterMovement::TryMoveTo(MoveDirection moveState)
 {
-	if (m_pCurrentTile)
-		m_pCurrentTile->LeaveCharacter();
-
-	m_pCurrentTile = pTile;
-
-	if (isMoveOn)
-		pTile->EnterCharacter(m_pCharacter);
-
-	m_DesiredPos = pTile->GetGameObject()->GetTransform().GetWorld().Position;
-
-	TransformComponent& trans = m_pGameObject->GetTransform();
-	trans.SetPosition(m_DesiredPos);
-}
-
-void QBertCharacterMovement::SetToTile(int tileId, bool isMoveOn)
-{
-	SetToTile(m_pCharacter->GetLevel()->GetTile(tileId), isMoveOn);
-}
-
-void QBertCharacterMovement::HandleMove()
-{
-	GameState& gs = GameState::GetInstance();
-	TransformComponent& trans = m_pGameObject->GetTransform();
-
-	if (IsMoving())
-	{
-		const float remappedMoveDelay = m_CurrentMoveDelay / m_MoveDelay;
-		trans.SetPosition(Math2D::LERP(m_FormerPos, m_DesiredPos, 1.f - remappedMoveDelay));
-
-		m_CurrentMoveDelay -= gs.DeltaTime;
+	if (m_IsTryMove)
 		return;
-	}
 
-	LandOnTile(m_pCurrentTile);
-
-	const KeyboardMouseListener& kbml = KeyboardMouseListener::GetInstance();
 	const QBertTile::Neighbours& neighbours = m_pCurrentTile->GetNeighbours();
+	TransformComponent& trans = GetGameObject()->GetTransform();
 
-	bool isInput{};
+	m_IsTryMove = true;
 	QBertTile* pNextTile{};
 
-	//TODO: make commands
-
-	if (kbml.IsPressed(Key::A))
+	switch (moveState)
 	{
-		//m_pTexture->SetTextureOffset({ m_TextureSize * 6, 0.f });
-
-		pNextTile = neighbours.pLeftBottomNeighbour;
-		isInput = true;
-	}
-	else if (kbml.IsPressed(Key::D))
-	{
-		//m_pTexture->SetTextureOffset({ 0.f, 0.f });
-
-		pNextTile = neighbours.pRightTopNeighbour;
-		isInput = true;
-	}
-	else if (kbml.IsPressed(Key::W))
-	{
-		//m_pTexture->SetTextureOffset({ m_TextureSize * 2, 0.f });
-
+	case MoveDirection::TopLeft:
 		pNextTile = neighbours.pLeftTopNeighbour;
-		isInput = true;
-
-	}
-	else if (kbml.IsPressed(Key::S))
-	{
-		//m_pTexture->SetTextureOffset({ m_TextureSize * 4, 0.f });
-
+		break;
+	case MoveDirection::TopRight:
+		pNextTile = neighbours.pRightTopNeighbour;
+		break;
+	case MoveDirection::BottomLeft:
+		pNextTile = neighbours.pLeftBottomNeighbour;
+		break;
+	case MoveDirection::BottomRight:
 		pNextTile = neighbours.pRightBottomNeighbour;
-		isInput = true;
+		break;
+	case MoveDirection::Left:
+		break;
+	case MoveDirection::Right:
+		break;
 	}
-
-	if (!isInput)
-		return;
 
 	if (pNextTile)
 	{
@@ -119,11 +73,8 @@ void QBertCharacterMovement::HandleMove()
 
 		m_IsOnTile = false;
 
-		//TODO: broadcast "Has Moved/Jumped" event to character
-
-		//Vector2 texOffset = m_pTexture->GetTextureOffset();
-		//texOffset.x += m_TextureSize;
-		//m_pTexture->SetTextureOffset(texOffset);
+		//TODO: observer/subject?
+		m_pCharacter->HasMoved();
 	}
 	else
 	{
@@ -132,18 +83,70 @@ void QBertCharacterMovement::HandleMove()
 	}
 }
 
+void QBertCharacterMovement::SetToTile(QBertTile* pTile, bool isMoveOn)
+{
+	m_IsTryMove = false;
+	if (isMoveOn)
+		LandOnTile(pTile);
+	//stop character from stepping on tile
+	m_IsOnTile = true;
+
+	if (m_pCurrentTile)
+		m_pCurrentTile->LeaveCharacter();
+
+	pTile->EnterCharacter(m_pCharacter);
+
+	m_pCurrentTile = pTile;
+	m_CurrentMoveDelay = m_MoveDelay;
+	m_DesiredPos = pTile->GetGameObject()->GetTransform().GetWorld().Position;
+
+	TransformComponent& trans = GetGameObject()->GetTransform();
+	trans.SetPosition(m_DesiredPos);
+	m_FormerPos = m_DesiredPos;
+}
+
+void QBertCharacterMovement::SetToTile(int tileId, bool isMoveOn)
+{
+	SetToTile(GetLevel()->GetTile(tileId), isMoveOn);
+}
+
+void QBertCharacterMovement::HandleMove()
+{
+	GameState& gs = GameState::GetInstance();
+	TransformComponent& trans = GetGameObject()->GetTransform();
+
+	if (m_CurrentMoveDelay >= 0.f)
+	{
+		const float remappedMoveDelay = m_CurrentMoveDelay / m_MoveDelay;
+		trans.SetPosition(Math2D::LERP(m_FormerPos, m_DesiredPos, 1.f - remappedMoveDelay));
+
+		m_CurrentMoveDelay -= gs.DeltaTime;
+		return;
+	}
+
+	LandOnTile(m_pCurrentTile);
+}
+
 void QBertCharacterMovement::LandOnTile(QBertTile* pTile)
 {
 	if (m_IsOnTile)
 		return;
 
-	m_pCharacter->GetLevel()->MoveOnTile(m_pCharacter, pTile->GetId());
+	GetLevel()->MoveOnTile(m_pCharacter, pTile->GetId());
 	m_IsOnTile = true;
 
-	//TODO: broadcast "HasLanded" event to character
+	m_IsTryMove = false;
+
+	//TODO: observer/subject?
+	m_pCharacter->HasLanded();
 }
 
 void QBertCharacterMovement::LandOnTile(int tileId)
 {
-	LandOnTile(m_pCharacter->GetLevel()->GetTile(tileId));
+	LandOnTile(GetLevel()->GetTile(tileId));
+}
+
+QBertLevel* QBertCharacterMovement::GetLevel() const
+{
+	return m_pCharacter->GetLevel();
 }

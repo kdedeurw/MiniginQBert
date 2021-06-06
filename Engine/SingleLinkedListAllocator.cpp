@@ -36,9 +36,9 @@ void* SingleLinkedListAllocator::Acquire(const size_t nbBytes)
 		nextBlock = nextBlock->next;
 	}
 	if (!nextBlock)
-		throw std::exception("out of memory");
-	if (nextBlock->count > nbBlocks)
-	{
+		throw std::exception("SingleLinkedList>Acquire: out of memory");
+	//if (nextBlock->count > nbBlocks)
+	//{
 		// if enough memory found, allocate and return memory address, decrease size of remaining free memory
 		Block* newBlock = nextBlock + nbBlocks; // block AFTER allocated block
 		newBlock->count = nextBlock->count - nbBlocks; // set this block's size to remaining size of allocated memory
@@ -51,8 +51,8 @@ void* SingleLinkedListAllocator::Acquire(const size_t nbBytes)
 		previousBlock->next = nextBlock->next; //head->next is last block allocated
 
 		return nextBlock->data; // return data (union struct) which is 12bytes for 32bit and 8bytes for 64bit I think
-	}
-	throw std::exception("out of memory");
+	//}
+	//throw std::exception("SingleLinkedList>Acquire: out of memory");
 }
 
 void SingleLinkedListAllocator::Release(void* pointerToBuffer)
@@ -60,10 +60,7 @@ void SingleLinkedListAllocator::Release(void* pointerToBuffer)
 	Block* pBlock{ reinterpret_cast<Block*>(reinterpret_cast<Header*>(pointerToBuffer) - 1) };
 
 	if (pBlock < m_pHead || pBlock >= m_pHead + m_pHead->count) //head.count is only used here!
-	{
-		throw std::exception("invalid pointer");
-		return;
-	}
+		throw std::exception("SingleLinkedList>Release: invalid pointer");
 
 	//Note: inserts the chunk into the list at its respective position
 	//		the 'free' list is sorted at all times

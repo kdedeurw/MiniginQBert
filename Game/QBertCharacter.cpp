@@ -21,5 +21,5 @@ QBertCharacter::~QBertCharacter()
 void QBertCharacter::Initialize()
 {
 	if (!m_pMovement)
-		m_pMovement = m_pGameObject->GetComponent<QBertCharacterMovement>();
+		m_pMovement = GetGameObject()->GetComponent<QBertCharacterMovement>();
 }

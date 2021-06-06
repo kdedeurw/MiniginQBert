@@ -21,7 +21,7 @@ GameObject::GameObject(TransformComponent& transform)
 	AddComponent(&transform);
 }
 
-GameObject::~GameObject()
+GameObject::~GameObject() noexcept
 {
 	m_pParent = nullptr;
 
@@ -47,6 +47,8 @@ void GameObject::Update()
 
 	for (Component* pComponent : m_pComponents)
 	{
+		if (!m_pComponents.size())
+			break;
 		pComponent->Update();
 	}
 }
@@ -58,6 +60,8 @@ void GameObject::Render() const
 
 	for (Component* pComponent : m_pComponents)
 	{
+		if (!m_pComponents.size())
+			break;
 		pComponent->Render();
 	}
 }
@@ -69,6 +73,8 @@ void GameObject::PostRender() const
 
 	for (Component* pComponent : m_pComponents)
 	{
+		if (!m_pComponents.size())
+			break;
 		pComponent->PostRender();
 	}
 }

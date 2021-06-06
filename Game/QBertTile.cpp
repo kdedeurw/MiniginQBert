@@ -33,7 +33,7 @@ QBertTile::~QBertTile()
 void QBertTile::Initialize()
 {
 	if (!m_pTexture)
-		m_pTexture = m_pGameObject->GetComponent<Texture2DComponent>();
+		m_pTexture = GetGameObject()->GetComponent<Texture2DComponent>();
 
 	m_pTexture->SetTexture("QBert/Sprites.png");
 	m_pTexture->SetTextureOffset(m_TextureOffset);
@@ -73,14 +73,14 @@ void QBertTile::SetState(TileState state)
 	case TileState::IntermediateState:
 		if (!m_HasBeenIntermediateState)
 		{
-			m_pSubject->Notify(m_pGameObject, (int)QBertEvent::event_tile_colour_change_intermediate);
+			m_pSubject->Notify(GetGameObject(), (int)QBertEvent::event_tile_colour_change_intermediate);
 			m_HasBeenIntermediateState = true;
 		}
 		break;
 	case TileState::TargetState:
 		if (!m_HasBeenTargetState)
 		{
-			m_pSubject->Notify(m_pGameObject, (int)QBertEvent::event_tile_colour_change_final);
+			m_pSubject->Notify(GetGameObject(), (int)QBertEvent::event_tile_colour_change_final);
 			m_HasBeenTargetState = true;
 		}
 		break;

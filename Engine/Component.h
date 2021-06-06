@@ -11,7 +11,7 @@ public:
 	Component()
 		: m_pGameObject{}
 	{}
-	virtual ~Component()
+	virtual ~Component() noexcept
 	{
 		m_pGameObject = nullptr;
 	}
@@ -27,9 +27,9 @@ public:
 	virtual void Update() = 0;
 	virtual void PostUpdate() {};
 
-	GameObject* GetGameObject() const { return m_pGameObject; };
+	GameObject* GetGameObject() const { return m_pGameObject; }
 
-protected:
+private:
 	friend class GameObject;
 	GameObject* m_pGameObject;
 };

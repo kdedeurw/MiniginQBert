@@ -38,12 +38,13 @@ private:
 	short m_CurrRound, m_CurrLevel, m_CurrentTargetTiles;
 	const short m_MaxRounds = 4;
 	const short m_MaxLevels = 3;
-	const int m_AmountOfTiles = 3;
-	const int m_LowerRowSize = 2;
+	const int m_AmountOfTiles = 28;
+	const int m_LowerRowSize = 7;
 	unsigned int m_CurrentEnemyId;
 	float m_CurrentEnemySpawnDelay;
-	const float m_EnemySpawnDelay = 3.f;
+	const float m_EnemySpawnDelay = 1.f;
 	QBertGameObserver* m_pObserver;
+	//TODO: vector of players
 	QBertPlayer* m_pPlayer;
 	std::vector<QBertTile*> m_pTiles;
 	std::vector<QBertCharacter*> m_pEnemies;

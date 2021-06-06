@@ -26,6 +26,8 @@ private:
 	PlayerId m_PlayerId;
 	Texture2DComponent* m_pTexture;
 
+	void HasMoved() override;
+	void HasLanded() override;
 	void HandleInput();
 
 	static const float m_TextureSize;

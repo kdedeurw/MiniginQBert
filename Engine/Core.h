@@ -25,7 +25,7 @@ namespace Engine2D
 		std::thread m_AudioThread;
 
 		void InitializeSDL();
-		void Cleanup();
+		void Cleanup() noexcept;
 
 		bool ProcessInputs();
 	};

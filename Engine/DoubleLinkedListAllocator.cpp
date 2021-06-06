@@ -53,15 +53,15 @@ void* DoubleLinkedListAllocator::Acquire(const size_t nbBytes)
 		pBlock = pBlock->link.next;
 	}
 	if (pBlock == m_pSentinel)
-		throw std::exception("out of memory");
-	if (pBlock->count > nbBlocks)
-	{
+		throw std::exception("DoubleLinkedList>Acquire: out of memory");
+	//if (pBlock->count > nbBlocks)
+	//{
 		Block* newBlock{ pBlock + nbBlocks };
 		newBlock->status = Status::free;
 		newBlock->count = pBlock->count - nbBlocks;
 		pBlock->count = nbBlocks;
 		InsertAfter(*m_pSentinel, *newBlock);
-	}
+	//}
 	Unlink(*pBlock);
 	pBlock->status = Status::reserved;
 	return pBlock->data;
@@ -72,10 +72,7 @@ void DoubleLinkedListAllocator::Release(void* pointerToBuffer)
 	Block* pBlock{ reinterpret_cast<Block*>(reinterpret_cast<Header*>(pointerToBuffer) - 1) };
 
 	if (pBlock < m_pHead || pBlock >= m_pHead + m_pHead->count)
-	{
-		throw std::exception("invalid pointer");
-		return;
-	}
+		throw std::exception("DoubleLinkedList>Release:invalid pointer");
 
 	pBlock->status = Status::free;
 	InsertAfter(*m_pSentinel, *pBlock);

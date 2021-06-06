@@ -46,7 +46,7 @@ void TransformComponent::Translate(float x, float y)
 	m_Local.Position.y += y;
 	m_TransformChanges |= TransformChange::Translation;
 
-	for (GameObject* pChild : m_pGameObject->GetChildren())
+	for (GameObject* pChild : GetGameObject()->GetChildren())
 		pChild->GetTransform().m_TransformChanges |= TransformChange::Translation;
 }
 
@@ -55,7 +55,7 @@ void TransformComponent::Translate(const Vector2& vec2)
 	m_Local.Position += vec2;
 	m_TransformChanges |= TransformChange::Translation;
 
-	for (GameObject* pChild : m_pGameObject->GetChildren())
+	for (GameObject* pChild : GetGameObject()->GetChildren())
 		pChild->GetTransform().m_TransformChanges |= TransformChange::Translation;
 }
 
@@ -64,7 +64,7 @@ void TransformComponent::Translate(const Vector3& vec3)
 	m_Local.Position += vec3;
 	m_TransformChanges |= TransformChange::Translation;
 
-	for (GameObject* pChild : m_pGameObject->GetChildren())
+	for (GameObject* pChild : GetGameObject()->GetChildren())
 		pChild->GetTransform().m_TransformChanges |= TransformChange::Translation;
 }
 
@@ -75,7 +75,7 @@ void TransformComponent::SetPosition(float x, float y, float z)
 	m_Local.Position.z = z;
 	m_TransformChanges |= TransformChange::Translation;
 
-	for (GameObject* pChild : m_pGameObject->GetChildren())
+	for (GameObject* pChild : GetGameObject()->GetChildren())
 		pChild->GetTransform().m_TransformChanges |= TransformChange::Translation;
 }
 
@@ -86,7 +86,7 @@ void TransformComponent::SetPosition(const Vector2& vec2, float z)
 	m_Local.Position.z = z;
 	m_TransformChanges |= TransformChange::Translation;
 
-	for (GameObject* pChild : m_pGameObject->GetChildren())
+	for (GameObject* pChild : GetGameObject()->GetChildren())
 		pChild->GetTransform().m_TransformChanges |= TransformChange::Translation;
 }
 
@@ -95,7 +95,7 @@ void TransformComponent::SetPosition(const Vector3& vec3)
 	m_Local.Position = vec3;
 	m_TransformChanges |= TransformChange::Translation;
 
-	for (GameObject* pChild : m_pGameObject->GetChildren())
+	for (GameObject* pChild : GetGameObject()->GetChildren())
 		pChild->GetTransform().m_TransformChanges |= TransformChange::Translation;
 }
 
@@ -104,7 +104,7 @@ void TransformComponent::Rotate(float r)
 	m_Local.Rotation += r;
 	m_TransformChanges |= TransformChange::Rotation;
 
-	for (GameObject* pChild : m_pGameObject->GetChildren())
+	for (GameObject* pChild : GetGameObject()->GetChildren())
 		pChild->GetTransform().m_TransformChanges |= TransformChange::Rotation;
 }
 
@@ -113,7 +113,7 @@ void TransformComponent::SetRotation(float r)
 	m_Local.Rotation = r;
 	m_TransformChanges |= TransformChange::Rotation;
 
-	for (GameObject* pChild : m_pGameObject->GetChildren())
+	for (GameObject* pChild : GetGameObject()->GetChildren())
 		pChild->GetTransform().m_TransformChanges |= TransformChange::Rotation;
 }
 
@@ -123,7 +123,7 @@ void TransformComponent::SetScale(float x, float y)
 	m_Local.Scale.y = y;
 	m_TransformChanges |= TransformChange::Scale;
 
-	for (GameObject* pChild : m_pGameObject->GetChildren())
+	for (GameObject* pChild : GetGameObject()->GetChildren())
 		pChild->GetTransform().m_TransformChanges |= TransformChange::Scale;
 }
 
@@ -132,13 +132,13 @@ void TransformComponent::SetScale(const Vector2& scale)
 	m_Local.Scale = scale;
 	m_TransformChanges |= TransformChange::Scale;
 
-	for (GameObject* pChild : m_pGameObject->GetChildren())
+	for (GameObject* pChild : GetGameObject()->GetChildren())
 		pChild->GetTransform().m_TransformChanges |= TransformChange::Scale;
 }
 
 void TransformComponent::CalculateWorldPosition()
 {
-	GameObject* pParent{ &m_pGameObject->GetParent() };
+	GameObject* pParent{ &GetGameObject()->GetParent() };
 
 	if (!pParent)
 	{
@@ -165,7 +165,7 @@ void TransformComponent::CalculateWorldPosition()
 
 void TransformComponent::CalculateWorldRotation()
 {
-	GameObject* pParent{ &m_pGameObject->GetParent() };
+	GameObject* pParent{ &GetGameObject()->GetParent() };
 
 	if (!pParent)
 	{
@@ -185,7 +185,7 @@ void TransformComponent::CalculateWorldRotation()
 
 void TransformComponent::CalculateWorldScale()
 {
-	GameObject* pParent{ &m_pGameObject->GetParent() };
+	GameObject* pParent{ &GetGameObject()->GetParent() };
 
 	if (!pParent)
 	{

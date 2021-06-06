@@ -13,7 +13,7 @@ public:
 	Scene& operator=(Scene&& other) = delete;
 
 	GameObject* CreateGameObject();
-	void RemoveGameObject(GameObject* pGameObject);
+	void RemoveGameObject(GameObject* pGameObject, bool isDelete = true);
 
 	virtual void Initialize();
 	virtual void Update();
@@ -27,8 +27,8 @@ private:
 	friend class GlobalMemoryPools;
 	explicit Scene(std::string name);
 
+	void SortGameObjects();
 	static unsigned int m_IdCounter;
-	size_t m_AmountOfGameObjects;
 
 	friend class SceneManager;
 	std::string m_Name;

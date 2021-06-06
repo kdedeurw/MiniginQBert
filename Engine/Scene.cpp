@@ -10,8 +10,15 @@ unsigned int Scene::m_IdCounter = 0;
 Scene::Scene(std::string name)
 	: m_Name{ std::move(name) }
 	, m_GameObjects{}
-	, m_AmountOfGameObjects{}
 {}
+
+void Scene::SortGameObjects()
+{
+	std::sort(m_GameObjects.begin(), m_GameObjects.end(), [](GameObject* pObj, GameObject* pObj2)->bool
+		{
+			return pObj->GetTransform().GetWorld().Position.z > pObj2->GetTransform().GetWorld().Position.z;
+		});
+}
 
 Scene::~Scene()
 {
@@ -29,16 +36,22 @@ GameObject* Scene::CreateGameObject()
 	++m_IdCounter;
 	m_GameObjects.push_back(pGameObject);
 	pGameObject->m_pScene = this;
+
+	SortGameObjects();
+
 	return pGameObject;
 }
 
-void Scene::RemoveGameObject(GameObject* pGameObject)
+void Scene::RemoveGameObject(GameObject* pGameObject, bool isDelete)
 {
 	const auto it = std::find(m_GameObjects.begin(), m_GameObjects.end(), pGameObject);
 	if (it != m_GameObjects.end())
 	{
 		m_GameObjects.erase(it);
-		delete (*it);
+		if (isDelete)
+			delete pGameObject;
+
+		SortGameObjects();
 	}
 }
 
@@ -52,19 +65,9 @@ void Scene::Initialize()
 
 void Scene::Update()
 {
-	const size_t size = m_GameObjects.size();
-	if (m_AmountOfGameObjects != size) //detected change
+	for (GameObject* pGameObject : m_GameObjects)
 	{
-		std::sort(m_GameObjects.begin(), m_GameObjects.end(), [](GameObject* pObj, GameObject* pObj2)->bool 
-			{
-				return pObj->GetTransform().GetWorld().Position.z > pObj2->GetTransform().GetWorld().Position.z;
-			});
-		m_AmountOfGameObjects = size;
-	}
-	for (size_t i{}; i < size; ++i)
-	{
-		//safe to add objects during run-time
-		m_GameObjects[i]->Update();
+		pGameObject->Update();
 	}
 }
 

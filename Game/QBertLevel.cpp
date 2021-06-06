@@ -38,7 +38,7 @@ void QBertLevel::Initialize()
 	m_pObserver = GlobalMemoryPools::GetInstance().CreateOnStack<QBertGameObserver>();
 
 	const float tileSize = QBertTile::GetTextureSize();
-	const Vector2& scale = m_pGameObject->GetTransform().GetWorld().Scale;
+	const Vector2& scale = GetGameObject()->GetTransform().GetWorld().Scale;
 	int delimiter = m_LowerRowSize;
 	float totalX{ tileSize };
 	float totalY{};
@@ -70,27 +70,27 @@ void QBertLevel::PostRender() const
 {
 	for (QBertTile* pTile : m_pTiles)
 	{
-		const Vector2& scale = pTile->m_pGameObject->GetTransform().GetWorld().Scale;
+		const Vector2& scale = pTile->GetGameObject()->GetTransform().GetWorld().Scale;
 		const QBertTile::Neighbours& neighBours = pTile->GetNeighbours();
 		if (neighBours.pLeftTopNeighbour)
 		{
-			Renderer::GetInstance().DrawLine(pTile->m_pGameObject->GetTransform().GetWorld().Position,
-				neighBours.pLeftTopNeighbour->m_pGameObject->GetTransform().GetWorld().Position, RGBAColour{ 255, 0, 0, 128 });
+			Renderer::GetInstance().DrawLine(pTile->GetGameObject()->GetTransform().GetWorld().Position,
+				neighBours.pLeftTopNeighbour->GetGameObject()->GetTransform().GetWorld().Position, RGBAColour{ 255, 0, 0, 128 });
 		}
 		if (neighBours.pRightTopNeighbour)
 		{
-			Renderer::GetInstance().DrawLine(pTile->m_pGameObject->GetTransform().GetWorld().Position,
-				neighBours.pRightTopNeighbour->m_pGameObject->GetTransform().GetWorld().Position, RGBAColour{ 255, 0, 0, 128 });
+			Renderer::GetInstance().DrawLine(pTile->GetGameObject()->GetTransform().GetWorld().Position,
+				neighBours.pRightTopNeighbour->GetGameObject()->GetTransform().GetWorld().Position, RGBAColour{ 255, 0, 0, 128 });
 		}
 		if (neighBours.pRightBottomNeighbour)
 		{
-			Renderer::GetInstance().DrawLine(pTile->m_pGameObject->GetTransform().GetWorld().Position,
-				neighBours.pRightBottomNeighbour->m_pGameObject->GetTransform().GetWorld().Position, RGBAColour{ 255, 0, 0, 128 });
+			Renderer::GetInstance().DrawLine(pTile->GetGameObject()->GetTransform().GetWorld().Position,
+				neighBours.pRightBottomNeighbour->GetGameObject()->GetTransform().GetWorld().Position, RGBAColour{ 255, 0, 0, 128 });
 		}
 		if (neighBours.pLeftBottomNeighbour)
 		{
-			Renderer::GetInstance().DrawLine(pTile->m_pGameObject->GetTransform().GetWorld().Position,
-				neighBours.pLeftBottomNeighbour->m_pGameObject->GetTransform().GetWorld().Position, RGBAColour{ 255, 0, 0, 128 });
+			Renderer::GetInstance().DrawLine(pTile->GetGameObject()->GetTransform().GetWorld().Position,
+				neighBours.pLeftBottomNeighbour->GetGameObject()->GetTransform().GetWorld().Position, RGBAColour{ 255, 0, 0, 128 });
 		}
 
 		Font* pFont = ResourceManager::GetInstance().LoadFont("Lingua.otf", 24);
@@ -101,13 +101,13 @@ void QBertLevel::PostRender() const
 		if (pCharacter)
 			Renderer::GetInstance().DrawTextImmediate(typeid(pCharacter->GetType()).name(), pFont, pos.x, pos.y, 1.f, 1.f, RGBAColour{ 0, 0, 255, 128 });
 
-		Renderer::GetInstance().DrawPoint(pTile->m_pGameObject->GetTransform().GetWorld().Position, scale.x, RGBAColour{ 0, 255, 0, 128 });
+		Renderer::GetInstance().DrawPoint(pTile->GetGameObject()->GetTransform().GetWorld().Position, scale.x, RGBAColour{ 0, 255, 0, 128 });
 	}
 }
 
 void QBertLevel::Update()
 {
-	//HandleEnemySpawning();
+	HandleEnemySpawning();
 }
 
 void QBertLevel::ClearAllEnemies()
@@ -128,13 +128,11 @@ void QBertLevel::MoveOnTile(QBertCharacter* pCharacter, int tileId)
 	const TileAlteration tileAlteration = GetCharacterTileAlteration(pTile->GetCurrentCharacter()->GetType());
 	if (tileAlteration == TileAlteration::Next)
 	{
-		EvaluateNextState(state);
-		pTile->SetState(state);
+		pTile->SetState(EvaluateNextState(state));
 	}
 	else if (tileAlteration == TileAlteration::Previous)
 	{
-		EvaluatePreviousState(state);
-		pTile->SetState(state);
+		pTile->SetState(EvaluatePreviousState(state));
 	}
 
 	if (m_CurrentTargetTiles == m_AmountOfTiles)
@@ -161,7 +159,9 @@ void QBertLevel::RemoveEnemy(QBertCharacter* pEnemy)
 	if (it != m_pEnemies.end())
 	{
 		m_pEnemies.erase(it);
-		delete pEnemy->GetGameObject();
+		//TODO: what a mess
+		GetGameObject()->RemoveChildObject(pEnemy->GetGameObject());
+		GetGameObject()->GetScene().RemoveGameObject(pEnemy->GetGameObject());
 	}
 }
 
@@ -192,23 +192,25 @@ TileState QBertLevel::EvaluateNextState(TileState state)
 			--m_CurrentTargetTiles;
 			return TileState::DefaultState;
 		}
+		return TileState::IntermediateState;
 	}
 
 	case TileState::TargetState:
 	{
 		if (currLevelData.CanGoBack)
 		{
-			if (targetState == TileState::IntermediateState)
-			{
-				//--m_CurrentTargetTiles;
-				return TileState::DefaultState;
-			}
-			else
-			{
+			//if (targetState == TileState::IntermediateState)
+			//{
+			//	--m_CurrentTargetTiles;
+			//	return TileState::DefaultState;
+			//}
+			//else
+			//{
 				--m_CurrentTargetTiles;
 				return TileState::IntermediateState;
-			}
+			//}
 		}
+		return TileState::TargetState;
 	}
 	}
 
@@ -236,6 +238,9 @@ TileState QBertLevel::EvaluatePreviousState(TileState state)
 
 void QBertLevel::HandleEnemySpawning()
 {
+	if (m_pEnemies.size() == 3)
+		return;
+
 	GameState& gs = GameState::GetInstance();
 
 	m_CurrentEnemySpawnDelay -= gs.DeltaTime;
@@ -281,6 +286,7 @@ QBertLevel::TileAlteration QBertLevel::GetCharacterTileAlteration(QBertCharacter
 	case QBertCharacterType::SlickSam:
 		return TileAlteration::Previous;
 	}
+
 	return TileAlteration::None;
 }
 
@@ -293,7 +299,7 @@ void QBertLevel::OnRoundWin()
 		if (OnLevelWin())
 			return;
 	}
-	m_pObserver->OnNotify(m_pGameObject, QBertEvent::event_round_complete);
+	m_pObserver->OnNotify(GetGameObject(), QBertEvent::event_round_complete);
 	CommenceNextRound();
 }
 
@@ -359,11 +365,10 @@ GameObject* QBertLevel::CreatePlayer()
 	QBertCharacterMovement* pMovement = gm.CreateComponent<QBertCharacterMovement>();
 	pGo->AddComponent(pMovement);
 
-	//prevent first tile from being moved on
-	pMovement->m_IsOnTile = true;
-
 	//TODO: fix for coop/versus
 	pMovement->SetToTile(GetUpperTile());
+
+	pMovement->AssignCharacter(m_pPlayer);
 	
 	m_pPlayer->GetSubject()->AddObserver(m_pObserver);
 
@@ -409,7 +414,11 @@ GameObject* QBertLevel::CreateEnemy(char type)
 
 	pEnemy->GetSubject()->AddObserver(m_pObserver);
 
-	//TODO: spawn on tile rows
+	pMovement->AssignCharacter(pEnemy);
+
+	//TODO: invisible spawn tile, no connections???
+
+	//TODO: spawn on other tiles (rows)
 	pMovement->SetToTile(GetUpperTile());
 
 	return pGo;

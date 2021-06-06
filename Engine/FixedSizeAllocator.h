@@ -120,9 +120,9 @@ void FixedSizeAllocator<T>::Release(void* ptr)
 {
 	Block* pBlock{ reinterpret_cast<Block*>(reinterpret_cast<Header*>(ptr) - 1) };
 
-	//if (pBlock < m_pPool || pBlock >= m_pPool + m_Size * sizeof(Block))
-	//	throw std::exception("invalid pointer");
-	//TODO: fix
+	//TODO: fix?
+	if (pBlock < m_pPool || pBlock >= m_pPool + m_Size * sizeof(Block))
+		throw std::exception("FixedSizeAllocator>Release: invalid pointer");
 
 	pBlock->status = Status::free;
 	Block* pFormerLast{ m_pLast };

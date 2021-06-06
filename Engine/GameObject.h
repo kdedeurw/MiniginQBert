@@ -7,7 +7,7 @@ class Scene;
 class GameObject final
 {
 public:
-	virtual ~GameObject();
+	virtual ~GameObject() noexcept;
 	GameObject(const GameObject & other) = delete;
 	GameObject(GameObject && other) = delete;
 	GameObject& operator=(const GameObject & other) = delete;
