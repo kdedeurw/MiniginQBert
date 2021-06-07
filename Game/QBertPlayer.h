@@ -1,6 +1,7 @@
 #pragma once
 #include "QBertCharacter.h"
 
+class QBertSpinningDisk;
 class QBertPlayer final : public QBertCharacter
 {
 public:
@@ -15,6 +16,7 @@ public:
 	PlayerId GetId() const { return m_PlayerId; }
 	void Kill(bool hasFallen) override;
 	void Respawn(bool hasFallen = true);
+	void UseSpinningDisk(QBertSpinningDisk* pDisk);
 
 	bool IsKilled() const { return m_IsKilled; }
 	const QBertCharacterType GetType() const override { return QBertCharacterType::QBert; }
@@ -24,8 +26,10 @@ public:
 
 private:
 	bool m_IsKilled;
+	float m_RespawnDelay;
 	PlayerId m_PlayerId;
 	Texture2DComponent* m_pTexture;
+	QBertSpinningDisk* m_pDisk;
 
 	void HasMoved() override;
 	void HasLanded() override;

@@ -24,6 +24,9 @@
     <Filter Include="Game Files\QBert\Events">
       <UniqueIdentifier>{1673a013-dc1a-4ddc-b73b-e1803dc18104}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game Files\QBert\UI">
+      <UniqueIdentifier>{5b5179e7-2be9-405a-9e81-fa172c2e07f2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -73,6 +76,18 @@
     </ClCompile>
     <ClCompile Include="QBertSpinningDisk.cpp">
       <Filter>Game Files\QBert\Level</Filter>
+    </ClCompile>
+    <ClCompile Include="QBertBaseTile.cpp">
+      <Filter>Game Files\QBert\Level</Filter>
+    </ClCompile>
+    <ClCompile Include="QBertUI.cpp">
+      <Filter>Game Files\QBert\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="QBertMainMenu.cpp">
+      <Filter>Game Files\QBert\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="QBertGameOverMenu.cpp">
+      <Filter>Game Files\QBert\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -126,6 +141,18 @@
     </ClInclude>
     <ClInclude Include="QBertSpinningDisk.h">
       <Filter>Game Files\QBert\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="QBertBaseTile.h">
+      <Filter>Game Files\QBert\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="QBertUI.h">
+      <Filter>Game Files\QBert\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="QBertMainMenu.h">
+      <Filter>Game Files\QBert\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="QBertGameOverMenu.h">
+      <Filter>Game Files\QBert\UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

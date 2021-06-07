@@ -3,6 +3,7 @@
 #include "QBertLevel.h"
 #include "QBertTile.h"
 #include "QBertCharacter.h"
+#include "QBertSpinningDisk.h"
 
 QBertCharacterMovement::QBertCharacterMovement()
 	: m_IsOnTile{}
@@ -27,7 +28,6 @@ void QBertCharacterMovement::Initialize(bool forceInitialize)
 	if (!m_pCharacter)
 		m_pCharacter = GetGameObject()->GetComponent<QBertCharacter>();
 
-	//TODO: possible base class, remove this when inheriting
 	m_IsInitialized = true;
 }
 
@@ -41,11 +41,11 @@ void QBertCharacterMovement::TryMoveTo(MoveDirection moveState)
 	if (m_IsTryMove)
 		return;
 
-	const QBertTile::Neighbours& neighbours = m_pCurrentTile->GetNeighbours();
+	const QBertBaseTile::Neighbours& neighbours = m_pCurrentTile->GetNeighbours();
 	TransformComponent& trans = GetGameObject()->GetTransform();
 
 	m_IsTryMove = true;
-	QBertTile* pNextTile{};
+	QBertBaseTile* pNextTile{};
 
 	switch (moveState)
 	{
@@ -69,6 +69,13 @@ void QBertCharacterMovement::TryMoveTo(MoveDirection moveState)
 
 	if (pNextTile)
 	{
+		if (pNextTile->GetType() == QBertTileType::SpinningDisk && m_pCharacter->GetType() != QBertCharacterType::QBert)
+		{
+			m_pCurrentTile->LeaveCharacter();
+			m_pCharacter->Kill(true);
+			return;
+		}
+
 		m_CurrentMoveDelay = m_MoveDelay;
 
 		m_FormerPos = trans.GetWorld().Position;
@@ -89,7 +96,20 @@ void QBertCharacterMovement::TryMoveTo(MoveDirection moveState)
 	}
 }
 
-void QBertCharacterMovement::SetToTile(QBertTile* pTile, bool isMoveOn)
+void QBertCharacterMovement::MoveToTile(QBertBaseTile* pTile, bool isMoveOn)
+{
+	m_DesiredPos = pTile->GetGameObject()->GetTransform().GetWorld().Position;
+	TransformComponent& trans = GetGameObject()->GetTransform();
+	m_FormerPos = trans.GetWorld().Position;
+
+	m_CurrentMoveDelay = m_MoveDelay;
+	m_pCurrentTile->LeaveCharacter();
+	m_pCurrentTile = pTile;
+
+	m_IsOnTile = isMoveOn;
+}
+
+void QBertCharacterMovement::SetToTile(QBertBaseTile* pTile, bool isMoveOn)
 {
 	m_DesiredPos = pTile->GetGameObject()->GetTransform().GetWorld().Position;
 	TransformComponent& trans = GetGameObject()->GetTransform();
@@ -100,7 +120,7 @@ void QBertCharacterMovement::SetToTile(QBertTile* pTile, bool isMoveOn)
 	if (isMoveOn)
 		LandOnTile(pTile);
 	else
-		pTile->EnterCharacter(m_pCharacter);
+		pTile->TryEnter(m_pCharacter);
 
 	//stop character from stepping on tile
 	m_IsOnTile = true;
@@ -134,7 +154,7 @@ void QBertCharacterMovement::HandleMove()
 	LandOnTile(m_pCurrentTile);
 }
 
-void QBertCharacterMovement::LandOnTile(QBertTile* pTile)
+void QBertCharacterMovement::LandOnTile(QBertBaseTile* pTile)
 {
 	if (m_IsOnTile)
 		return;

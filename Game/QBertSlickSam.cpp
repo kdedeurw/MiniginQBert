@@ -32,7 +32,7 @@ void QBertSlickSam::Initialize(bool forceInitialize)
 		m_pSprite->SetInitTexOffset({ 0.f, 128.f });
 		m_pSprite->SetPlayOnce(false);
 
-		m_pSprite->SetSpriteLayout(SpriteLayout::Vertical);
+		m_pSprite->SetSpriteLayout(SpriteLayout::Horizontal);
 		const int frames = 4;
 		m_pSprite->SetMaxFrames(frames, 0);
 		m_pSprite->SetTickRate(m_RestDelay);

@@ -6,6 +6,7 @@
 #include "QBertTile.h"
 #include "QBertLevel.h"
 #include "QBertCharacterMovement.h"
+#include "QBertSpinningDisk.h"
 
 const float QBertPlayer::m_TextureSize = 16.f;
 
@@ -13,11 +14,15 @@ QBertPlayer::QBertPlayer()
 	: m_IsKilled{}
 	, m_PlayerId{ PlayerId::Player1 }
 	, m_pTexture{}
+	, m_pDisk{}
+	, m_RespawnDelay{}
 {
 }
 
 QBertPlayer::~QBertPlayer()
 {
+	m_pTexture = nullptr;
+	m_pDisk = nullptr;
 }
 
 void QBertPlayer::Initialize(bool forceInitialize)
@@ -53,7 +58,11 @@ void QBertPlayer::Render() const
 
 void QBertPlayer::Update()
 {
-	HandleInput();
+	GameState& gs = GameState::GetInstance();
+
+	m_RespawnDelay -= gs.DeltaTime;
+	if (m_RespawnDelay <= 0.f)
+		HandleInput();
 }
 
 void QBertPlayer::Respawn(bool hasFallen)
@@ -62,6 +71,15 @@ void QBertPlayer::Respawn(bool hasFallen)
 	if (hasFallen)
 		GetMovement()->SetToTile(GetLevel()->GetUpperTile());
 	m_IsKilled = false;
+}
+
+void QBertPlayer::UseSpinningDisk(QBertSpinningDisk* pDisk)
+{
+	m_pDisk = pDisk;
+	GetLevel()->QueueEvent(this, GameEvent::kill_all_enemies_non_coily);
+	GetMovement()->SetMoveDelay(GetMovement()->GetMoveDelay() * 2.f);
+	GetMovement()->MoveToTile(GetLevel()->GetUpperTile());
+	GetMovement()->SetMoveDelay(GetMovement()->GetMoveDelay() / 2.f);
 }
 
 void QBertPlayer::HasMoved()
@@ -76,6 +94,12 @@ void QBertPlayer::HasLanded()
 	Vector2 texOffset = m_pTexture->GetTextureOffset();
 	texOffset.x -= m_TextureSize;
 	m_pTexture->SetTextureOffset(texOffset);
+
+	if (m_pDisk)
+	{
+		GetLevel()->QueueEvent(m_pDisk, GameEvent::kill_disk);
+		m_pDisk = nullptr;
+	}
 }
 
 void QBertPlayer::HandleInput()
@@ -114,7 +138,7 @@ void QBertPlayer::Kill(bool hasFallen)
 	GetSubject()->Notify(GetGameObject(), QBertEvent::event_player_die);
 	m_IsKilled = true;
 
-	//TODO: add respawn delay
+	m_RespawnDelay = 1.f;
 
 	Respawn(hasFallen);
 }

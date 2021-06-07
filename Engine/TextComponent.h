@@ -23,7 +23,8 @@ public:
 	void SetFont(Font* pFont);
 	void SetText(std::string text);
 	void SetColour(RGBAColour colour);
-	Vector2& GetOffset() { return m_Offset; };
+	void SetOffset(const Vector2& offset) { m_Offset = offset; }
+	Vector2& GetOffset() { return m_Offset; }
 	//texturedata might NOT always be valid, be sure what you're doing here!
 	Texture* GetTextureData() const { return m_pTextureData; }
 

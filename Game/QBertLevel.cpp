@@ -8,17 +8,21 @@
 #include "QBertRedBall.h"
 #include "QBertCoily.h"
 #include "QBertSlickSam.h"
+#include "QBertSpinningDisk.h"
 
 QBertLevel::QBertLevel()
-	: m_CurrRound{ 1 }
-	, m_CurrLevel{ 2 }
+	: m_CurrRound{ 0 }
+	, m_CurrLevel{ 0 }
+	, m_GameWin{}
 	, m_CurrentTargetTiles{}
 	, m_CurrentEnemySpawnDelay{}
 	, m_CurrentEnemyId{}
+	, m_CurrentRoundWinDelay{}
 	, m_pObserver{}
 	, m_pTiles{}
 	, m_pEnemies{}
 	, m_pPlayers{}
+	, m_pDisks{}
 	, m_LevelDatas{ QBertLevelReader::GetLevelData("../Resources/QBertLevels.json") }
 {
 	m_pTiles.reserve(28);
@@ -41,11 +45,7 @@ void QBertLevel::Initialize(bool forceInitialize)
 	//TODO: find workaround
 	QBertCharacter::m_pLevel = this;
 
-	QBertLevelReader::GetLevelData("../Resources/QBertLevels.json");
-
 	m_CurrentEnemySpawnDelay = m_EnemySpawnDelay;
-
-	m_pObserver = new QBertGameObserver{};
 
 	const float tileSize = QBertTile::GetTextureSize();
 	const Vector2& scale = GetGameObject()->GetTransform().GetWorld().Scale;
@@ -70,6 +70,9 @@ void QBertLevel::Initialize(bool forceInitialize)
 
 	ConnectTiles();
 
+	AddDiskToLevel(false);
+	AddDiskToLevel(true);
+
 	GameObject* pPlayer = CreatePlayer();
 	GetGameObject()->AddChildObject(pPlayer);
 	QBertCharacterMovement* pMovement = pPlayer->GetComponent<QBertCharacterMovement>();
@@ -81,6 +84,8 @@ void QBertLevel::Initialize(bool forceInitialize)
 
 void QBertLevel::PostRender() const
 {
+#ifdef _DEBUG
+
 	for (QBertTile* pTile : m_pTiles)
 	{
 		const Vector2& scale = pTile->GetGameObject()->GetTransform().GetWorld().Scale;
@@ -116,16 +121,35 @@ void QBertLevel::PostRender() const
 
 		Renderer::GetInstance().DrawPoint(pTile->GetGameObject()->GetTransform().GetWorld().Position, scale.x, RGBAColour{ 0, 255, 0, 128 });
 	}
+	for (QBertSpinningDisk* pDisk : m_pDisks)
+	{
+		QBertBaseTile* pNeighbour = pDisk->GetNeighbours().pRightBottomNeighbour;
+		if (pNeighbour)
+		Renderer::GetInstance().DrawLine(pDisk->GetGameObject()->GetTransform().GetWorld().Position,
+			pNeighbour->GetGameObject()->GetTransform().GetWorld().Position, RGBAColour{ 255, 0, 0, 128 });
+		pNeighbour = pDisk->GetNeighbours().pLeftBottomNeighbour;
+		if (pNeighbour)
+			Renderer::GetInstance().DrawLine(pDisk->GetGameObject()->GetTransform().GetWorld().Position,
+				pNeighbour->GetGameObject()->GetTransform().GetWorld().Position, RGBAColour{ 255, 0, 0, 128 });
+	}
+
+#endif
 }
 
 void QBertLevel::Update()
 {
-	HandleGameEvents();
+	GameState& gs = GameState::GetInstance();
 
-	HandleEnemySpawning();
+	HandleGameEventsQueue();
+
+	m_CurrentRoundWinDelay -= gs.DeltaTime;
+	if (m_CurrentRoundWinDelay < 0.f)
+		HandleEnemySpawning();
+
+	HandleGameOver();
 }
 
-void QBertLevel::HandleGameEvents()
+void QBertLevel::HandleGameEventsQueue()
 {
 	while (!m_Events.empty())
 	{
@@ -133,7 +157,7 @@ void QBertLevel::HandleGameEvents()
 		switch (req.Event)
 		{
 		case GameEvent::kill_enemy:
-			RemoveEnemy(req.pCharacter);
+			RemoveEnemy(dynamic_cast<QBertCharacter*>(req.pEntity));
 			break;
 		case GameEvent::kill_all_enemies:
 			ClearAllEnemies();
@@ -142,6 +166,12 @@ void QBertLevel::HandleGameEvents()
 			break;
 		case GameEvent::kill_all_players:
 			ClearAllPlayers();
+			break;
+		case GameEvent::kill_disk:
+			RemoveDisk(dynamic_cast<QBertSpinningDisk*>(req.pEntity));
+			break;
+		case GameEvent::kill_all_enemies_non_coily:
+			ClearAllButCoily();
 			break;
 		}
 		m_Events.pop();
@@ -152,14 +182,32 @@ void QBertLevel::ClearAllEnemies()
 {
 	for (QBertCharacter* pEnemy : m_pEnemies)
 	{
-		GetGameObject()->RemoveChildObject(pEnemy->GetGameObject());
-		GetGameObject()->GetScene().RemoveGameObject(pEnemy->GetGameObject());
+		RemoveEnemy(pEnemy);
 	}
 	m_pEnemies.clear();
 	for (QBertTile* pTile : m_pTiles)
 	{
 		pTile->LeaveCharacter();
 	}
+	m_CurrentEnemySpawnDelay = m_EnemySpawnDelay;
+}
+
+void QBertLevel::ClearAllButCoily()
+{
+	std::vector<QBertCharacter*> pCoilies{};
+	for (QBertCharacter* pEnemy : m_pEnemies)
+	{
+		if (pEnemy->GetType() == QBertCharacterType::Coily)
+			pCoilies.push_back(pEnemy);
+		else
+			RemoveEnemy(pEnemy);
+	}
+	m_pEnemies.swap(pCoilies);
+	for (QBertTile* pTile : m_pTiles)
+	{
+		pTile->LeaveCharacter();
+	}
+	m_CurrentEnemySpawnDelay = m_EnemySpawnDelay;
 }
 
 void QBertLevel::ClearAllPlayers()
@@ -167,45 +215,83 @@ void QBertLevel::ClearAllPlayers()
 	for (QBertPlayer* pPlayer : m_pPlayers)
 	{
 		pPlayer->GetMovement()->GetCurrentTile()->LeaveCharacter();
-		GetGameObject()->RemoveChildObject(pPlayer->GetGameObject());
-		GetGameObject()->GetScene().RemoveGameObject(pPlayer->GetGameObject());
+		RemoveEntity(pPlayer);
 	}
 	m_pPlayers.clear();
+}
+
+void QBertLevel::RemoveDisk(QBertSpinningDisk* pDisk)
+{
+	const auto it = std::find(m_pDisks.begin(), m_pDisks.end(), pDisk);
+	if (it != m_pDisks.end())
+	{
+		(*it)->Disconnect();
+		m_pDisks.erase(it);
+		RemoveEntity(pDisk);
+	}
 }
 
 void QBertLevel::MoveOnTile(QBertCharacter* pCharacter, int tileId)
 {
 	QBertTile* pTile = GetTile(tileId);
-	if (pTile->EnterCharacter(pCharacter))
+	if (!pTile)
 	{
-		switch (pCharacter->GetTileAlteration())
-		{
-		case::QBertTileAlteration::None:
-			break;
-		case::QBertTileAlteration::Next:
-			pTile->SetState(EvaluateNextState(pTile->GetState()));
-			break;
-		case::QBertTileAlteration::Previous:
-			pTile->SetState(EvaluatePreviousState(pTile->GetState()));
-			break;
-		}
+		QBertSpinningDisk* pDisk = GetDisk(tileId);
+		pDisk->TryEnter(pCharacter);
 	}
+	else
+	{
+		if (pTile->TryEnter(pCharacter))
+		{
+			switch (pCharacter->GetTileAlteration())
+			{
+			case::QBertTileAlteration::None:
+				break;
+			case::QBertTileAlteration::Next:
+				pTile->SetState(EvaluateNextState(pTile->GetState()));
+				break;
+			case::QBertTileAlteration::Previous:
+				pTile->SetState(EvaluatePreviousState(pTile->GetState()));
+				break;
+			}
+		}
 
-	if (m_CurrentTargetTiles == m_AmountOfTiles)
-		OnRoundWin();
+		if (m_CurrentTargetTiles == m_AmountOfTiles)
+			OnRoundWin();
+	}
 }
 
 QBertTile* QBertLevel::GetTile(int tileId) const
 {
-	tileId = Math2D::Clamp(tileId, 0, m_AmountOfTiles);
+	if (tileId < 0 || tileId >= m_AmountOfTiles)
+		return nullptr;
 	return m_pTiles[tileId];
 }
 
-void QBertLevel::QueueEvent(QBertCharacter* pCharacter, GameEvent event)
+QBertSpinningDisk* QBertLevel::GetDisk(int id)
+{
+	return m_pDisks[id - m_AmountOfTiles];
+}
+
+void QBertLevel::Reset()
+{
+	ResetAllTiles();
+	ClearAllEnemies();
+	for (QBertPlayer* pPlayer : m_pPlayers)
+	{
+		pPlayer->Respawn();
+	}
+	m_CurrentEnemySpawnDelay = m_EnemySpawnDelay;
+	m_CurrentEnemyId = 0;
+	m_CurrLevel = 0;
+	m_CurrRound = 0;
+}
+
+void QBertLevel::QueueEvent(Component* pEntity, GameEvent event)
 {
 	GameEventRequest req;
 	req.Event = event;
-	req.pCharacter = pCharacter;
+	req.pEntity = pEntity;
 	m_Events.push(std::move(req));
 }
 
@@ -217,6 +303,13 @@ void QBertLevel::ResetAllTiles()
 		pTile->Reset();
 }
 
+void QBertLevel::RemoveEntity(Component* pEntity)
+{
+	//TODO: what a mess
+	GetGameObject()->RemoveChildObject(pEntity->GetGameObject());
+	GetGameObject()->GetScene().RemoveGameObject(pEntity->GetGameObject());
+}
+
 void QBertLevel::RemoveEnemy(QBertCharacter* pEnemy)
 {
 	const auto it = std::find(m_pEnemies.begin(), m_pEnemies.end(), pEnemy);
@@ -225,9 +318,7 @@ void QBertLevel::RemoveEnemy(QBertCharacter* pEnemy)
 		pEnemy->GetMovement()->GetCurrentTile()->LeaveCharacter();
 
 		m_pEnemies.erase(it);
-		//TODO: what a mess
-		GetGameObject()->RemoveChildObject(pEnemy->GetGameObject());
-		GetGameObject()->GetScene().RemoveGameObject(pEnemy->GetGameObject());
+		RemoveEntity(pEnemy);
 	}
 }
 
@@ -333,6 +424,18 @@ void QBertLevel::HandleEnemySpawning()
 	}
 }
 
+void QBertLevel::HandleGameOver()
+{
+	if (!m_pObserver)
+		return;
+
+	const auto& stats = m_pObserver->GetStats(PlayerId::Player1);
+	if (stats.Lives <= 0)
+		OnGameOver();
+
+	OnGameWin();
+}
+
 void QBertLevel::CommenceNextRound()
 {
 	ResetAllTiles();
@@ -342,10 +445,56 @@ void QBertLevel::CommenceNextRound()
 		pPlayer->Respawn(true);
 
 	m_CurrentEnemySpawnDelay = m_EnemySpawnDelay * 1.5f;
+
+	AddDiskToLevel(true);
+	AddDiskToLevel(false);
+}
+
+void QBertLevel::AddDiskToLevel(bool isLeft)
+{
+	GameObject* pDisk = CreateSpinningDisk();
+
+	QBertSpinningDisk* pDiskComp = pDisk->GetComponent<QBertSpinningDisk>();
+
+	int id{};
+	if (isLeft)
+		id = GetLowerRowMin(m_LowerRowSize / 2);
+	else
+		id = GetLowerRowMax(m_LowerRowSize / 2);
+
+	QBertTile* pNeighbour = GetTile(id);
+	pNeighbour->AddSpinningDisk(pDiskComp, isLeft);
+	const Transform& neighbourWorld = pNeighbour->GetGameObject()->GetTransform().GetWorld();
+	Vector2 pos = neighbourWorld.Position;
+
+	const float tileSize = QBertTile::GetTextureSize();
+
+	if (isLeft)
+	{
+		pos.x -= (tileSize / 2.f) * neighbourWorld.Scale.x;
+		pos.y += (tileSize / 2.f) * neighbourWorld.Scale.x;
+	}
+	else
+	{
+		pos.x += (tileSize / 2.f) * neighbourWorld.Scale.x;
+		pos.y += (tileSize / 2.f) * neighbourWorld.Scale.x;
+	}
+
+	pDisk->GetTransform().SetPosition(pos);
+
+	GetGameObject()->AddChildObject(pDisk);
 }
 
 void QBertLevel::OnRoundWin()
 {
+	for (QBertSpinningDisk* pDisk : m_pDisks)
+	{
+		m_pObserver->GetStats(PlayerId::Player1).Score += 25;
+		m_pObserver->OnNotify(GetGameObject(), QBertEvent::event_spinning_pad_used);
+		RemoveDisk(pDisk);
+	}
+	m_pDisks.clear();
+
 	++m_CurrRound;
 	std::cout << "Round " << m_CurrRound << " completed!\n";
 	if (m_CurrRound >= m_MaxRounds)
@@ -355,6 +504,8 @@ void QBertLevel::OnRoundWin()
 	}
 	m_pObserver->OnNotify(GetGameObject(), QBertEvent::event_round_complete);
 	CommenceNextRound();
+
+	m_CurrentRoundWinDelay = m_RoundWinDelay;
 }
 
 bool QBertLevel::OnLevelWin()
@@ -364,7 +515,7 @@ bool QBertLevel::OnLevelWin()
 	std::cout << "Level " << m_CurrLevel << " completed!\n";
 	if (m_CurrLevel >= m_MaxLevels)
 	{
-		OnGameWin();
+		m_GameWin = true;
 		return true;
 	}
 	return false;
@@ -372,6 +523,11 @@ bool QBertLevel::OnLevelWin()
 
 void QBertLevel::OnGameWin()
 {
+	if (!m_GameWin)
+		return;
+
+	m_GameWin = false;
+
 	std::cout << "Game won!\n";
 	m_CurrLevel = 0;
 	m_CurrRound = 0;
@@ -382,7 +538,16 @@ void QBertLevel::OnGameWin()
 	for (QBertPlayer* pPlayer : m_pPlayers)
 		pPlayer->Respawn(true);
 
-	//TODO: return to main menu
+	SceneManager::GetInstance().ToggleScene("QBertScene", false);
+	SceneManager::GetInstance().ToggleScene("MainMenuScene", false);
+}
+
+void QBertLevel::OnGameOver()
+{
+	SceneManager::GetInstance().ToggleScene("QBertScene", false);
+	Reset();
+	CommenceNextRound();
+	SceneManager::GetInstance().ToggleScene("GameOverScene", true);
 }
 
 GameObject* QBertLevel::CreateTile()
@@ -434,32 +599,30 @@ GameObject* QBertLevel::CreateEnemy(char type)
 	GameObject* pGo = GetGameObject()->GetScene().CreateGameObject();
 
 	QBertCharacter* pEnemy{};
-	pEnemy = new QBertSlickSam{};
-	type;
-	//switch (type)
-	//{
-	//case 'R':
-	//	pEnemy = new QBertRedBall{};
-	//	break;
-	//case 'C':
-	//	pEnemy = new QBertCoily{};
-	//	break;
-	//case 'U':
-	//	pEnemy = new QBertRedBall{};
-	//	break;
-	//case 'W':
-	//	pEnemy = new QBertRedBall{};
-	//	break;
-	//case 'G':
-	//	pEnemy = new QBertRedBall{};
-	//	break;
-	//case 'S':
-	//	pEnemy = new QBertSlickSam{};
-	//	break;
-	//default:
-	//	std::cout << "Unsupported enemy: \'" << type << "\'\n";
-	//	break;
-	//}
+	switch (type)
+	{
+	case 'R':
+		pEnemy = new QBertRedBall{};
+		break;
+	case 'C':
+		pEnemy = new QBertCoily{};
+		break;
+	case 'U':
+		pEnemy = new QBertRedBall{};
+		break;
+	case 'W':
+		pEnemy = new QBertRedBall{};
+		break;
+	case 'G':
+		pEnemy = new QBertRedBall{};
+		break;
+	case 'S':
+		pEnemy = new QBertSlickSam{};
+		break;
+	default:
+		std::cout << "Unsupported enemy: \'" << type << "\'\n";
+		break;
+	}
 
 	SpriteComponent* pSprite = new SpriteComponent{};
 	pGo->AddComponent(pSprite, false);
@@ -479,7 +642,22 @@ GameObject* QBertLevel::CreateEnemy(char type)
 
 GameObject* QBertLevel::CreateSpinningDisk()
 {
-	return nullptr;
+	//GlobalMemoryPools& gm = GlobalMemoryPools::GetInstance();
+	GameObject* pGo = GetGameObject()->GetScene().CreateGameObject();
+
+	SpriteComponent* pSprite = new SpriteComponent{};
+	pGo->AddComponent(pSprite);
+
+	QBertSpinningDisk* pDisk = new QBertSpinningDisk{};
+	pGo->AddComponent(pDisk);
+
+	pDisk->GetSubject()->AddObserver(m_pObserver);
+
+	pDisk->m_Id = static_cast<short>(m_pTiles.size() + m_pDisks.size());
+
+	m_pDisks.push_back(pDisk);
+
+	return pGo;
 }
 
 void QBertLevel::ConnectTiles()

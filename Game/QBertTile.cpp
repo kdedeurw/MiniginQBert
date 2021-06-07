@@ -3,6 +3,7 @@
 #include "Subject.h"
 #include "QBertEvents.h"
 #include "QBertCharacter.h"
+#include "QBertSpinningDisk.h"
 
 int QBertTile::m_TextureId = 0;
 const float QBertTile::m_TextureSize = 32.f;
@@ -11,23 +12,14 @@ Vector2 QBertTile::m_TextureOffset{ 80.f, 160.f };
 QBertTile::QBertTile()
 	: m_HasBeenIntermediateState{}
 	, m_HasBeenTargetState{}
-	, m_Id{ -1 }
 	, m_State{ TileState::DefaultState }
 	, m_pTexture{}
-	, m_pCurrentCharacter{}
-	, m_pSubject{ new Subject{} }
-	, m_Neighbours{}
 {
 }
 
 QBertTile::~QBertTile()
 {
 	m_pTexture = nullptr;
-	m_pCurrentCharacter = nullptr;
-	std::memset(&m_Neighbours, 0, sizeof(Neighbours));
-	if (m_pSubject)
-		delete m_pSubject;
-	m_pSubject = nullptr;
 }
 
 void QBertTile::Initialize(bool forceInitialize)
@@ -58,11 +50,42 @@ void QBertTile::Reset()
 	m_State = TileState::DefaultState;
 	m_HasBeenIntermediateState = false;
 	m_HasBeenTargetState = false;
-	m_pCurrentCharacter = nullptr;
+	LeaveCharacter();
 	//update texture offset
 	Vector4& srcRct = m_pTexture->GetTexture2D()->GetSourceRect();
 	srcRct.x = m_TextureOffset.x * m_TextureId;
 	srcRct.y = m_TextureOffset.y;
+}
+
+void QBertTile::AddSpinningDisk(QBertSpinningDisk* pDisk, bool isLeft)
+{
+	if (isLeft)
+	{
+		if (!m_Neighbours.pLeftTopNeighbour)
+		{
+			m_Neighbours.pLeftTopNeighbour = pDisk;
+			pDisk->Connect(this, isLeft);
+			return;
+		}
+	}
+	else
+	{
+		if (!m_Neighbours.pRightTopNeighbour)
+		{
+			m_Neighbours.pRightTopNeighbour = pDisk;
+			pDisk->Connect(this, isLeft);
+			return;
+		}
+	}
+	std::cout << "Tile has no free top neighbours!\n";
+}
+
+void QBertTile::RemoveSpinningDisk(bool isLeft)
+{
+	if (isLeft)
+		m_Neighbours.pLeftTopNeighbour = nullptr;
+	else
+		m_Neighbours.pRightTopNeighbour = nullptr;
 }
 
 void QBertTile::SetState(TileState state)
@@ -92,20 +115,9 @@ void QBertTile::SetState(TileState state)
 	}
 }
 
-bool QBertTile::EnterCharacter(QBertCharacter* pNewCharacter)
+bool QBertTile::TryEnter(QBertCharacter* pNewCharacter)
 {
-	if (!m_pCurrentCharacter)
-	{
-		m_pCurrentCharacter = pNewCharacter;
-		return true;
-	}
-	else
-		return EvaluateCharacterConflict(pNewCharacter);
-}
-
-void QBertTile::LeaveCharacter()
-{
-	m_pCurrentCharacter = nullptr;
+	return EvaluateCharacterConflict(pNewCharacter);
 }
 
 bool QBertTile::EvaluateCharacterConflict(QBertCharacter* pNewCharacter)

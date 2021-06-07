@@ -1,5 +1,5 @@
 #pragma once
-#include "Component.h"
+#include "QBertBaseTile.h"
 
 enum class TileState
 {
@@ -8,10 +8,10 @@ enum class TileState
 	TargetState,
 };
 
-class QBertCharacter;
 class Texture2DComponent;
 class Subject;
-class QBertTile final : public Component
+class QBertSpinningDisk;
+class QBertTile final : public QBertBaseTile
 {
 public:
 	QBertTile();
@@ -22,39 +22,22 @@ public:
 	virtual void Update() override;
 
 	void Reset();
+	void AddSpinningDisk(QBertSpinningDisk* pDisk, bool isLeft);
+	void RemoveSpinningDisk(bool isLeft);
 
+	const QBertTileType GetType() const override { return QBertTileType::Tile; }
 	TileState GetState() const { return m_State; }
 	void SetState(TileState state);
 
-	QBertCharacter* GetCurrentCharacter() const { return m_pCurrentCharacter; }
-	//Did the character also enter the tile or get killed?
-	bool EnterCharacter(QBertCharacter* pNewCharacter);
-	void LeaveCharacter();
-
-	Subject* GetSubject() const { return m_pSubject; }
-	short GetId() const { return m_Id; }
-
-	struct Neighbours
-	{
-		QBertTile* pLeftTopNeighbour = nullptr;
-		QBertTile* pRightTopNeighbour = nullptr;
-		QBertTile* pRightBottomNeighbour = nullptr;
-		QBertTile* pLeftBottomNeighbour = nullptr;
-	};
-
-	const Neighbours& GetNeighbours() const { return m_Neighbours; }
+	bool TryEnter(QBertCharacter* pNewCharacter) override;
 
 	static float GetTextureSize() { return m_TextureSize; }
 
 private:
 	friend class QBertLevel;
 	bool m_HasBeenIntermediateState, m_HasBeenTargetState;
-	short m_Id;
 	TileState m_State;
 	Texture2DComponent* m_pTexture;
-	QBertCharacter* m_pCurrentCharacter;
-	Subject* m_pSubject;
-	Neighbours m_Neighbours;
 
 	bool EvaluateCharacterConflict(QBertCharacter* pNewCharacter);
 

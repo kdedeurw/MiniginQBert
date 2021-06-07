@@ -15,6 +15,9 @@
 #include "QBertGameObserver.h"
 #include "QBertPlayer.h"
 #include "QBertLevel.h"
+#include "QBertUI.h"
+#include "QBertMainMenu.h"
+#include "QbertGameOverMenu.h"
 
 #include "CameraTester.h"
 #include "SoundTester.h"
@@ -53,15 +56,101 @@ void CameraTestScene()
 	pGo->AddComponent(pCt);
 }
 
-void QBertScene()
+void MenuScenes(QBertGameObserver* pObserver, QBertLevel* pLevel)
+{
+	Scene& mainMenuScene = SceneManager::GetInstance().CreateScene("MainMenuScene");
+	GameObject* pGo = mainMenuScene.CreateGameObject();
+	GameState& gs = GameState::GetInstance();
+
+	//Main
+	Texture2DComponent* pTexComp = new Texture2DComponent{};
+	pTexComp->SetTexture("QBert/Menus.png");
+	pTexComp->SetTextureSize({ 161.25f, 145.25f });
+	pTexComp->SetTextureOffset({ 161.25f * 2.f, 145.25f });
+
+	pGo->AddComponent(pTexComp);
+	pGo->GetTransform().Translate(gs.pWindowInfo->Width / 2.f, gs.pWindowInfo->Height / 2.f);
+	pGo->GetTransform().SetScale({3.f, 3.f});
+
+	QBertMainMenu* pMainMenu = new QBertMainMenu{};
+	pGo->AddComponent(pMainMenu);
+
+	pGo = mainMenuScene.CreateGameObject();
+	TextComponent* pTc = new TextComponent{};
+	pTc->SetText("Press [Space] to start");
+	pTc->SetColour(RGBAColour{0, 255, 0, 255});
+	pGo->AddComponent(pTc);
+
+	pTc = new TextComponent{};
+	pTc->SetText("Q-E-A-D to move");
+	pTc->SetColour(RGBAColour{ 0, 255, 0, 255 });
+	pGo->AddComponent(pTc);
+	pTc->SetOffset({ 0.f, -50.f });
+
+	pGo->GetTransform().SetScale(2.5f, 2.5f);
+	pGo->GetTransform().Translate(gs.pWindowInfo->Width / 2.f, gs.pWindowInfo->Height / 4.f);
+
+	//GameOver
+	Scene& gameOverScene = SceneManager::GetInstance().CreateScene("GameOverScene", false);
+	pGo = gameOverScene.CreateGameObject();
+
+	QBertGameOverMenu* pGameOverMenu = new QBertGameOverMenu{};
+	pGo->AddComponent(pGameOverMenu);
+	pGameOverMenu->SetObserver(pObserver);
+	pGameOverMenu->SetLevel(pLevel);
+
+	pTexComp = new Texture2DComponent{};
+	pTexComp->SetTexture("QBert/Menus.png");
+	pTexComp->SetTextureSize({ 161.25f, 145.25f });
+	pTexComp->SetTextureOffset({ 161.25f * 2.f, 145.25f * 2.f });
+
+	pGo->AddComponent(pTexComp);
+	pGo->GetTransform().Translate(gs.pWindowInfo->Width / 2.f, gs.pWindowInfo->Height / 2.f);
+	pGo->GetTransform().SetScale({ 3.f, 3.f });
+
+	pGo = gameOverScene.CreateGameObject();
+	pTc = new TextComponent{};
+	pTc->SetText("Press [Enter] to restart");
+	pTc->SetColour(RGBAColour{ 0, 0, 255, 255 });
+	pTc->SetOffset({ -50.f, -60.f });
+	pGo->AddComponent(pTc);
+	pGo->GetTransform().Translate(gs.pWindowInfo->Width / 2.f, gs.pWindowInfo->Height / 2.f);
+	pGo->GetTransform().SetScale({ 3.f, 3.f });
+
+	QBertUI* pUI = new QBertUI{};
+	pGo->AddComponent(pUI);
+	pUI->SetObserver(pObserver);
+	pTc = new TextComponent{};
+	pTc->SetColour(RGBAColour{ 0, 255, 255, 255 });
+	pUI->SetScoreText(pTc);
+	pTc->SetOffset({ -75.f, -130.f });
+	pGo->AddComponent(pTc);
+	pGo->GetTransform().SetScale({ 2.f, 2.f });
+}
+
+void QBertScene(QBertGameObserver* pObserver, QBertLevel* pLevel)
 {
 	//GlobalMemoryPools& gm = GlobalMemoryPools::GetInstance();
-	Scene& scene = SceneManager::GetInstance().CreateScene("QBertScene");
+	Scene& scene = SceneManager::GetInstance().CreateScene("QBertScene", false);
 	GameObject* pGo = scene.CreateGameObject();
 
-	QBertLevel* pLevel = new QBertLevel{};
 	pGo->GetTransform().SetScale({2.f, 2.f});
 	pGo->AddComponent(pLevel);
+
+	pGo = scene.CreateGameObject();
+	QBertUI* pUI = new QBertUI{};
+	pGo->AddComponent(pUI);
+
+	pGo = scene.CreateGameObject();
+	TextComponent* pTc = new TextComponent{};
+	pUI->SetScoreText(pTc);
+	pGo->AddComponent(pTc);
+	pTc = new TextComponent{};
+	pUI->SetLivesText(pTc);
+	pGo->AddComponent(pTc);
+
+	pUI->SetObserver(pObserver); //hand over ownership
+	pLevel->SetObserver(pObserver);
 }
 
 int main(int, char* [])
@@ -71,7 +160,17 @@ int main(int, char* [])
 	//application.AddDemoScene();
 	application.AddFPSScene();
 
-	QBertScene();
+	QBertGameObserver* pObserver = new QBertGameObserver{};
+	QBertLevel* pLevel = new QBertLevel{};
+	try
+	{
+		MenuScenes(pObserver, pLevel);
+		QBertScene(pObserver, pLevel);
+	}
+	catch (std::exception& e)
+	{
+		std::cout << "Exception thrown during User Scene Init: " << e.what() << '\n';
+	}
 
 	application.Run();
 

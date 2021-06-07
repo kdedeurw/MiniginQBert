@@ -20,10 +20,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CameraTester.cpp" />
+    <ClCompile Include="QBertBaseTile.cpp" />
     <ClCompile Include="QBertCharacter.cpp" />
     <ClCompile Include="QBertCharacterMovement.cpp" />
     <ClCompile Include="QBertCoily.cpp" />
     <ClCompile Include="QBertGame.cpp" />
+    <ClCompile Include="QBertGameOverMenu.cpp" />
     <ClCompile Include="QBertLevelReader.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="pch.cpp">
@@ -34,30 +36,36 @@
     </ClCompile>
     <ClCompile Include="QBertGameObserver.cpp" />
     <ClCompile Include="QBertLevel.cpp" />
+    <ClCompile Include="QBertMainMenu.cpp" />
     <ClCompile Include="QBertPlayer.cpp" />
     <ClCompile Include="QBertRedBall.cpp" />
     <ClCompile Include="QBertSlickSam.cpp" />
     <ClCompile Include="QBertSpinningDisk.cpp" />
     <ClCompile Include="QBertTile.cpp" />
+    <ClCompile Include="QBertUI.cpp" />
     <ClCompile Include="SoundTester.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CameraTester.h" />
     <ClInclude Include="catch.hpp" />
+    <ClInclude Include="QBertBaseTile.h" />
     <ClInclude Include="QBertCharacter.h" />
     <ClInclude Include="QBertCharacterMovement.h" />
     <ClInclude Include="QBertCoily.h" />
     <ClInclude Include="QBertGame.h" />
+    <ClInclude Include="QBertGameOverMenu.h" />
     <ClInclude Include="QBertLevelReader.h" />
     <ClInclude Include="QBertEvents.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="QBertGameObserver.h" />
     <ClInclude Include="QBertLevel.h" />
+    <ClInclude Include="QBertMainMenu.h" />
     <ClInclude Include="QBertPlayer.h" />
     <ClInclude Include="QBertRedBall.h" />
     <ClInclude Include="QBertSlickSam.h" />
     <ClInclude Include="QBertSpinningDisk.h" />
     <ClInclude Include="QBertTile.h" />
+    <ClInclude Include="QBertUI.h" />
     <ClInclude Include="SoundTester.h" />
   </ItemGroup>
   <ItemGroup>

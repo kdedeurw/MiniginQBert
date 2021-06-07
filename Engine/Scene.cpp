@@ -56,9 +56,10 @@ void Scene::RemoveGameObject(GameObject* pGameObject, bool isDelete)
 
 void Scene::Initialize()
 {
-	for (GameObject* pGameObject : m_GameObjects)
+	const size_t size = m_GameObjects.size();
+	for (size_t i{}; i < size; ++i)
 	{
-		pGameObject->Initialize();
+		m_GameObjects[i]->Initialize();
 	}
 }
 

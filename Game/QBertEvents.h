@@ -14,4 +14,5 @@ enum QBertEvent
 	event_sam_catched,
 	event_round_complete,
 	event_level_complete,
+	event_spinning_pad_used,
 };

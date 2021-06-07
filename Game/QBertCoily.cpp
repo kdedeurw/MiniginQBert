@@ -111,10 +111,10 @@ void QBertCoily::HandleCoilyAI(QBertCharacterMovement* pMovement)
 	}
 	const Vector2& closestPlayerPos = pClosestPlayer->GetGameObject()->GetTransform().GetWorld().Position;
 
-	const QBertTile::Neighbours& neighbours = pMovement->GetCurrentTile()->GetNeighbours();
+	const QBertBaseTile::Neighbours& neighbours = pMovement->GetCurrentTile()->GetNeighbours();
 	Vector2 coilyToNeighbour{};
 	MoveDirection moveDir = MoveDirection::TopLeft;
-	QBertTile* pNeighbour{ neighbours.pLeftTopNeighbour };
+	QBertBaseTile* pNeighbour{ neighbours.pLeftTopNeighbour };
 	float newMag{};
 
 	bool canMove{};
@@ -210,6 +210,9 @@ void QBertCoily::HasLanded()
 	Vector2 texOffset = m_pSprite->GetTextureOffset();
 	texOffset.x -= m_TextureSize;
 	m_pSprite->SetInitTexOffset(texOffset);
+
+	if (!m_IsDescending)
+		return;
 
 	const int currTileId = GetMovement()->GetCurrentTile()->GetId();
 	if (currTileId < GetLevel()->GetLowerRowSize())
