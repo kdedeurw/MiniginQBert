@@ -19,7 +19,7 @@ It handles the main game loop and call the SceneManager.
 It also has 2 basic functions like "AddFPS" and "AddDemoScene"
 
 ---------------------Math2D------------------------
-MiniMath contains Vector classes; Vector2, Vector3 
+Math2D contains Vector classes; Vector2, Vector3 
 and Vector4.
 It also contains functions such as 
 Clamp and overloaded operators for Vectors and RGBA.
